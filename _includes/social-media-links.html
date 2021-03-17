@@ -5,9 +5,11 @@
   {% assign key = entry | first %}
   {% if sm[key].id %}
   {% if sm[key].title == "Email" %}
-  <a href="{{ sm[key].href }}{{ sm[key].id }}" title="{{ sm[key].title }}"><i class="fas {{ sm[key].fa-icon }}"></i></a>
+  <a href="{{ sm[key].href }}{{ sm[key].id }}" title="{{ sm[key].title }}"><i
+      class="fas {{ sm[key].fa-icon }} fa-2x"></i></a>
   {% else %}
-  <a href="{{ sm[key].href }}{{ sm[key].id }}" title="{{ sm[key].title }}"><i class="fab {{ sm[key].fa-icon }}"></i></a>
+  <a href="{{ sm[key].href }}{{ sm[key].id }}" title="{{ sm[key].title }}"><i
+      class="fab {{ sm[key].fa-icon }} fa-2x"></i></a>
   {% endif %}
   {% endif %}
   {% endfor %}

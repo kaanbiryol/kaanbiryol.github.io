@@ -5,16 +5,23 @@ layout: default
 <article class="post">
   <h1 class="post-title">{{ page.title }}</h1>
 
-  <span>[
+  <time datetime="{{ page.date | date_to_xmlschema }}" class="post-date">{{ page.date | date_to_string }}
+
+    <span style="float: right">
+      {% include read-time.html content=content %}
+    </span>
+
+  </time>
+
+  <span class="post-date">[
     {% for tag in page.tags %}
     {% capture tag_name %}{{ tag }}{% endcapture %}
-    <a href="/tag/{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code>&nbsp;</a>
+    <a href="/tag/{{ tag_name }}"><code class="highligher-rouge"><nobr>{{ tag_name }}</nobr></code></a>
     {% endfor %}
     ]</span>
 
-  <time datetime="{{ page.date | date_to_xmlschema }}" class="post-date">{{ page.date | date_to_string }}</time>
   {{ content }}
-  {% include social-media-links.html %}
+  {% include share-bar.html %}
 </article>
 
 {% if site.related_posts != empty %}

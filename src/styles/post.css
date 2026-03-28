@@ -85,12 +85,12 @@
   margin: 1.75em 0;
 }
 
-.prose h1 + *,
-.prose h2 + *,
-.prose h3 + *,
-.prose h4 + *,
-.prose h5 + * {
+.prose :is(h1, h2, h3, h4, h5) + * {
   margin-top: 0.5em !important;
+}
+
+.prose :is(h1, h2, h3, h4, h5) + * pre {
+  margin-top: 0 !important;
 }
 
 /* Tables */

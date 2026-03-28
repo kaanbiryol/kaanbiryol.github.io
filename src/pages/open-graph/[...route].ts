@@ -32,20 +32,14 @@ export const { getStaticPaths, GET } = await OGImageRoute({
     font: {
       title: {
         color: [28, 28, 28],
-        size: 68,
-        weight: 'SemiBold',
-        families: ['PingFang SC']
+        size: 64,
+        weight: 'SemiBold'
       },
       description: {
-        color: [180, 180, 180],
-        size: 40,
-        weight: 'Medium',
-        families: ['PingFang SC']
+        color: [160, 160, 160],
+        size: 36,
+        weight: 'Normal'
       }
-    },
-    fonts: [
-      'https://cdn.jsdelivr.net/npm/font-pingfang-sc-font-weight-improved@latest/PingFangSC-Medium.woff2',
-      'https://cdn.jsdelivr.net/npm/font-pingfang-sc-font-weight-improved@latest/PingFangSC-Semibold.woff2'
-    ]
+    }
   })
 })

@@ -13,7 +13,7 @@ This is a test post to preview how different markdown features render.
 
 ## Text formatting
 
-This is a paragraph with **bold text**, *italic text*, and `inline code`. Here's a [link to GitHub](https://github.com) and some ~~strikethrough text~~.
+This is a paragraph with **bold text**, _italic text_, and `inline code`. Here's a [link to GitHub](https://github.com) and some ~~strikethrough text~~.
 
 > This is a blockquote. It can span multiple lines and is useful for highlighting important information or quoting someone.
 
@@ -68,14 +68,14 @@ Ordered:
 
 ## Table
 
-| Scenario | Files | Modifiers | Time |
-|---|---|---|---|
-| Default | 1 | 1 | 0.42s |
-| Macro | 1 | 1 | 0.89s |
-| Large Default | 1 | 2000 | 3.21s |
-| Large Macro | 1 | 2000 | 4.67s |
-| Multi-file | 100 | 20 each | 5.12s |
-| Multi-file Macro | 100 | 20 each | 7.34s |
+| Scenario         | Files | Modifiers | Time  |
+| ---------------- | ----- | --------- | ----- |
+| Default          | 1     | 1         | 0.42s |
+| Macro            | 1     | 1         | 0.89s |
+| Large Default    | 1     | 2000      | 3.21s |
+| Large Macro      | 1     | 2000      | 4.67s |
+| Multi-file       | 100   | 20 each   | 5.12s |
+| Multi-file Macro | 100   | 20 each   | 7.34s |
 
 ## Horizontal rule
 

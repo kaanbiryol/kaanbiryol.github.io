@@ -77,6 +77,16 @@ Ordered:
 | Multi-file       | 100   | 20 each   | 5.12s |
 | Multi-file Macro | 100   | 20 each   | 7.34s |
 
+## Mermaid diagram
+
+```mermaid
+graph LR
+    A[Source Code] --> B[SourceKit]
+    B --> C[Module Interface]
+    C --> D[SwiftSyntax Rewriter]
+    D --> E[Interface Module]
+```
+
 ## Horizontal rule
 
 ---

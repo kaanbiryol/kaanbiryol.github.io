@@ -85,11 +85,11 @@
   margin: 1.75em 0;
 }
 
-.prose h1 + p,
-.prose h2 + p,
-.prose h3 + p,
-.prose h4 + p,
-.prose h5 + p {
+.prose h1 + *,
+.prose h2 + *,
+.prose h3 + *,
+.prose h4 + *,
+.prose h5 + * {
   margin-top: 0.5em;
 }
 

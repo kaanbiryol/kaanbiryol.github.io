@@ -5,12 +5,10 @@ import { render } from 'astro:content'
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts')
-  return posts
-    .filter((post) => !post.id.startsWith('_'))
-    .map((post) => ({
-      params: { slug: post.id },
-      props: post
-    }))
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/^_/, '') },
+    props: post
+  }))
 }
 
 type Props = CollectionEntry<'posts'>

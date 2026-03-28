@@ -1,7 +1,20 @@
 import { themeConfig } from '@/config'
 import type { DateFormat } from '@/types'
 
-const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+const MONTHS_EN = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+]
 
 const VALID_SEPARATORS = ['.', '-', '/']
 

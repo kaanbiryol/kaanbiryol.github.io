@@ -237,22 +237,26 @@ const { toc = [] }: TOCProps = Astro.props
     text-decoration: none;
     font-size: var(--font-size-s);
     letter-spacing: var(--spacing-m);
-    line-height: 1.5;
-    padding: 0.15rem 0;
+    line-height: 1.75;
+    padding: 0.1rem 0;
     color: var(--text-tertiary);
+    opacity: 0.5;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    transition: color 0.2s ease-out;
+    transition: color 0.2s ease-out, opacity 0.2s ease-out, font-weight 0.2s ease-out;
     cursor: pointer;
   }
 
   .toc-link:hover {
     color: var(--text-primary);
+    opacity: 0.8;
   }
 
   .toc-link.active {
     color: var(--text-primary);
+    opacity: 1;
+    font-weight: var(--font-weight-bold);
   }
 
   .toc-level-2 .toc-link {

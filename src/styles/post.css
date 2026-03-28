@@ -90,7 +90,7 @@
 .prose h3 + *,
 .prose h4 + *,
 .prose h5 + * {
-  margin-top: 0.5em;
+  margin-top: 0.5em !important;
 }
 
 /* Tables */

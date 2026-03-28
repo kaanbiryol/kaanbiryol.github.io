@@ -82,7 +82,7 @@
 /* Paragraphs */
 .prose p {
   line-height: 1.75;
-  margin: 1.75em 0;
+  margin: 1em 0;
 }
 
 .prose :is(h1, h2, h3, h4, h5) + * {

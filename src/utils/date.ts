@@ -1,7 +1,7 @@
 import { themeConfig } from '@/config'
 import type { DateFormat } from '@/types'
 
-const MONTHS_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+const MONTHS_EN = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
 
 const VALID_SEPARATORS = ['.', '-', '/']
 
@@ -37,7 +37,7 @@ export function formatDate(date: Date, format?: string): string {
       return `<span class="month">${monthName}</span> ${day} ${year}`
 
     case 'DAY MONTH YYYY':
-      return `${day} <span class="month">${monthName}</span> ${year}`
+      return `${day} <span class="month">${monthName}</span>, ${year}`
 
     default:
       return `${year}${separator}${pad(month)}${separator}${pad(day)}`

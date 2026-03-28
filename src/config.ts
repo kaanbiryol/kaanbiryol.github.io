@@ -22,7 +22,7 @@ export const themeConfig: ThemeConfig = {
 
   // DATE SETTINGS ///////////////////////////////////////////////////////////////////////////////////////
   date: {
-    dateFormat: 'YYYY-MM-DD', // Date format: YYYY-MM-DD, MM-DD-YYYY, DD-MM-YYYY, MONTH DAY YYYY, DAY MONTH YYYY
+    dateFormat: 'DAY MONTH YYYY', // Date format: YYYY-MM-DD, MM-DD-YYYY, DD-MM-YYYY, MONTH DAY YYYY, DAY MONTH YYYY
     dateSeparator: '.', // Date separator: . - / (except for MONTH DAY YYYY and DAY MONTH YYYY)
     dateOnRight: true // Date position in post list (true for right, false for left)
   },

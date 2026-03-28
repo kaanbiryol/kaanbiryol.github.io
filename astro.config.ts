@@ -28,6 +28,7 @@ export default defineConfig({
         light: 'github-light',
         dark: 'github-dark'
       },
+      defaultColor: false,
       wrap: false
     },
     remarkPlugins: [remarkMath, remarkDirective, remarkEmbeddedMedia, remarkReadingTime, remarkTOC],

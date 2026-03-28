@@ -8,16 +8,11 @@ const { toc = [] }: TOCProps = Astro.props
 <div class="toc-container" id="toc">
   <nav class="toc-nav">
     <ul class="toc-list" id="toc-list">
-      <!-- Back to top link -->
-      <li class="toc-item toc-level-0">
-        <a href="#" class="toc-link toc-title" title="Back to top" data-text="Back to top"> Back to top </a>
-      </li>
-
       <!-- TOC items -->
       {
         toc.map((item) => (
           <li class={`toc-item toc-level-${item.level}`}>
-            <a href={`#${item.id}`} class="toc-link" title={item.text} data-text={item.text}>
+            <a href={`#${item.id}`} class="toc-link" title={item.text}>
               {item.text}
             </a>
           </li>
@@ -36,28 +31,23 @@ const { toc = [] }: TOCProps = Astro.props
   }}
 >
   ;(function () {
-    // Core state
     const state = {
       container: null,
       links: null,
       headings: null,
-      titleLink: null,
       headingMap: new Map(),
       positions: [],
       scrollTimeout: null,
       hasContent: false
     }
 
-    // Initialize DOM elements
     function initElements() {
       state.container = document.querySelector('.toc-container')
       if (!state.container) return false
 
       state.links = document.querySelectorAll('.toc-link')
       state.headings = document.querySelectorAll('h1, h2, h3')
-      state.titleLink = document.querySelector('.toc-link.toc-title')
 
-      // Build heading map
       state.headingMap.clear()
       state.links.forEach((link) => {
         const href = link.getAttribute('href')
@@ -69,22 +59,16 @@ const { toc = [] }: TOCProps = Astro.props
       return true
     }
 
-    // Check if content exists
     function checkContent() {
       if (!state.container || !state.links) return
-
-      const tocItems = Array.from(state.links).filter((link) => !link.classList.contains('toc-title'))
-      state.hasContent = tocItems.length > 0
-
+      state.hasContent = state.links.length > 0
       if (!state.hasContent) {
         state.container.style.display = 'none'
       }
     }
 
-    // Cache heading positions
     function cachePositions() {
       if (!state.headings?.length) return
-
       const scrollTop = window.pageYOffset
       state.positions = Array.from(state.headings)
         .filter((_, index) => !(index === 0 && state.headings[0].tagName === 'H1'))
@@ -94,7 +78,6 @@ const { toc = [] }: TOCProps = Astro.props
         }))
     }
 
-    // Adjust TOC position
     function adjustPosition() {
       if (!state.container || !centeredLayout || !state.hasContent) {
         if (state.container) state.container.style.display = 'none'
@@ -103,55 +86,45 @@ const { toc = [] }: TOCProps = Astro.props
 
       const pageWidth = window.innerWidth
       const contentWidthValue = Math.max(parseFloat(contentWidth), 25)
-      const margin = (pageWidth - contentWidthValue * 16) / 2
-      const baseMinSpace = 11 * 16 // Base minimum space needed
-      const minSpace = toc ? baseMinSpace + 52 : baseMinSpace + 12
+      const contentPx = contentWidthValue * 16
+      const margin = (pageWidth - contentPx) / 2
+      const minSpace = 14 * 16
 
       if (margin >= minSpace) {
         state.container.style.display = 'block'
         state.container.classList.add('fixed-position')
-        const leftPosition = toc ? margin - 176 - 40 : margin - 176
-        state.container.style.left = `${leftPosition}px`
+        const rightPosition = margin - 13 * 16
+        state.container.style.right = `${rightPosition}px`
+        state.container.style.left = ''
       } else {
         state.container.style.display = 'none'
         state.container.classList.remove('fixed-position')
-        state.container.style.left = ''
+        state.container.style.right = ''
       }
     }
 
-    // Handle click events
     function handleClick(e) {
       const link = e.target.closest('.toc-link')
       if (!link) return
-
       e.preventDefault()
-
-      if (link.classList.contains('toc-title')) {
-        window.scrollTo({ top: 0, behavior: 'smooth' })
-        history.pushState(null, null, '#')
-      } else {
-        const href = link.getAttribute('href')
-        if (href?.startsWith('#')) {
-          const target = document.getElementById(href.substring(1))
-          if (target) {
-            const rect = target.getBoundingClientRect()
-            const scrollTop = window.pageYOffset || document.documentElement.scrollTop
-            const offset = rect.top + scrollTop - 96
-            window.scrollTo({ top: offset, behavior: 'smooth' })
-            history.pushState(null, null, href)
-          }
+      const href = link.getAttribute('href')
+      if (href?.startsWith('#')) {
+        const target = document.getElementById(href.substring(1))
+        if (target) {
+          const rect = target.getBoundingClientRect()
+          const scrollTop = window.pageYOffset || document.documentElement.scrollTop
+          const offset = rect.top + scrollTop - 96
+          window.scrollTo({ top: offset, behavior: 'smooth' })
+          history.pushState(null, null, href)
         }
       }
     }
 
-    // Update active state
     function updateActive() {
       if (!state.links?.length || !state.positions.length) return
-
       const scrollTop = window.pageYOffset + 100
       let currentActive = null
 
-      // Find current active heading
       for (let i = state.positions.length - 1; i >= 0; i--) {
         if (scrollTop >= state.positions[i].offsetTop) {
           currentActive = state.positions[i].id
@@ -159,41 +132,30 @@ const { toc = [] }: TOCProps = Astro.props
         }
       }
 
-      // Update active state
       state.links.forEach((link) => link.classList.remove('active'))
-
       if (currentActive && state.headingMap.has(currentActive)) {
         state.headingMap.get(currentActive).classList.add('active')
-      } else if (state.titleLink) {
-        state.titleLink.classList.add('active')
       }
     }
 
-    // Initialize
     function init(retryCount = 0) {
       const maxRetries = 5
-
       if (initElements()) {
         checkContent()
         adjustPosition()
         cachePositions()
-
         if (state.container) {
           state.container.removeEventListener('click', handleClick)
           state.container.addEventListener('click', handleClick)
         }
-
         updateActive()
       } else if (retryCount < maxRetries) {
         setTimeout(() => init(retryCount + 1), 100)
       }
     }
 
-    // Event handlers
     function handleScroll() {
-      if (state.scrollTimeout) {
-        cancelAnimationFrame(state.scrollTimeout)
-      }
+      if (state.scrollTimeout) cancelAnimationFrame(state.scrollTimeout)
       state.scrollTimeout = requestAnimationFrame(updateActive)
     }
 
@@ -202,42 +164,26 @@ const { toc = [] }: TOCProps = Astro.props
       requestAnimationFrame(cachePositions)
     }
 
-    // Cleanup
     function cleanup() {
       if (state.scrollTimeout) {
         cancelAnimationFrame(state.scrollTimeout)
         state.scrollTimeout = null
       }
-
       Object.assign(state, {
         container: null,
         links: null,
         headings: null,
-        titleLink: null,
         headingMap: new Map(),
         positions: [],
         hasContent: false
       })
     }
 
-    // Event listeners
-    document.addEventListener('astro:page-load', () => {
-      cleanup()
-      init()
-    })
-
-    document.addEventListener('astro:after-swap', () => {
-      cleanup()
-      init()
-    })
-
-    // Fallback for when Astro transitions are disabled
+    document.addEventListener('astro:page-load', () => { cleanup(); init() })
+    document.addEventListener('astro:after-swap', () => { cleanup(); init() })
     document.addEventListener('DOMContentLoaded', () => {
-      if (!state.container || !state.hasContent) {
-        init()
-      }
+      if (!state.container || !state.hasContent) init()
     })
-
     window.addEventListener('resize', handleResize)
     window.addEventListener('scroll', handleScroll)
   })()
@@ -247,7 +193,6 @@ const { toc = [] }: TOCProps = Astro.props
   .toc-container {
     width: 12rem;
     position: relative;
-    left: -0.175em;
     opacity: 0;
     transition: opacity 0.2s ease-out;
     display: none;
@@ -257,10 +202,7 @@ const { toc = [] }: TOCProps = Astro.props
     opacity: 1;
     position: fixed;
     top: 12rem;
-    margin-top: 0;
-    padding-left: 1rem;
     z-index: 10;
-    left: auto;
   }
 
   .toc-nav {
@@ -292,91 +234,35 @@ const { toc = [] }: TOCProps = Astro.props
 
   .toc-link {
     display: block;
-    color: transparent;
     text-decoration: none;
-    position: relative;
-    padding-left: 0;
-    height: 1.125rem;
-    width: 100%;
-    min-height: 1rem;
-    font-size: 0;
-    line-height: 1.125rem;
-    text-indent: 2rem;
+    font-size: var(--font-size-s);
+    letter-spacing: var(--spacing-m);
+    line-height: 1.5;
+    padding: 0.15rem 0;
+    color: var(--text-tertiary);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    transition:
-      color 0.2s ease-out,
-      font-size 0.2s ease-out,
-      text-indent 0.2s ease-out;
+    transition: color 0.2s ease-out;
     cursor: pointer;
   }
 
-  .toc-link::after {
-    content: attr(data-text);
-    position: absolute;
-    left: -0.5rem;
-    top: 0;
-    font-family: var(--sans);
-    font-size: var(--font-size-s);
-    letter-spacing: var(--spacing-m);
-    line-height: 1.125rem;
+  .toc-link:hover {
     color: var(--text-primary);
-    opacity: 0;
-    transition:
-      opacity 0.2s ease-out,
-      left 0.2s ease-out;
-    pointer-events: none;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    max-width: 100%;
-  }
-
-  .toc-link:hover::after {
-    opacity: 1;
-    left: -0.75rem;
-  }
-
-  .toc-level-0 .toc-link:hover::after {
-    opacity: 0;
-  }
-
-  .toc-level-1 .toc-link:hover::before,
-  .toc-level-2 .toc-link:hover::before,
-  .toc-level-3 .toc-link:hover::before {
-    width: 0.75rem;
-    transition: width 0.1s ease-out;
   }
 
   .toc-link.active {
     color: var(--text-primary);
   }
 
-  /* Horizontal line indicators */
-  .toc-level-0 .toc-link::before,
-  .toc-level-1 .toc-link::before,
-  .toc-level-2 .toc-link::before,
-  .toc-level-3 .toc-link::before {
-    content: '';
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: 1.75rem;
-    height: 1px;
-    background-color: var(--text-tertiary);
-    transform: translateY(-50%);
-    opacity: 0.4;
-    transition: all 0.1s ease-out;
+  .toc-level-2 .toc-link {
+    padding-left: 0.75rem;
   }
 
-  .toc-link:hover::before,
-  .toc-link.active::before {
-    opacity: 0.8;
-    background-color: var(--text-primary);
+  .toc-level-3 .toc-link {
+    padding-left: 1.5rem;
   }
 
-  /* Hide on mobile */
   @media (max-width: 768px) {
     .toc-container {
       display: none !important;

@@ -31,10 +31,26 @@
 .prose h3,
 .prose h4,
 .prose h5 {
-  font-size: var(--font-size-m);
   font-weight: var(--font-weight-bold);
   line-height: 1.75;
   margin: 3.75em 0 1.75em 0;
+}
+
+.prose h1 {
+  font-size: 1.5em;
+}
+
+.prose h2 {
+  font-size: 1.25em;
+}
+
+.prose h3 {
+  font-size: 1.1em;
+}
+
+.prose h4,
+.prose h5 {
+  font-size: var(--font-size-m);
 }
 
 /* Bold text */

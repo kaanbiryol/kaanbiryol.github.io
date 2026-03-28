@@ -96,14 +96,14 @@ html.dark {
 }
 
 /* Shiki dual theme: show light colors by default, dark when html.dark */
-html:not(.dark) .shiki,
-html:not(.dark) .shiki span {
+html:not(.dark) pre[data-language],
+html:not(.dark) pre[data-language] span {
   color: var(--shiki-light) !important;
   background-color: var(--shiki-light-bg) !important;
 }
 
-html.dark .shiki,
-html.dark .shiki span {
+html.dark pre[data-language],
+html.dark pre[data-language] span {
   color: var(--shiki-dark) !important;
   background-color: var(--shiki-dark-bg) !important;
 }

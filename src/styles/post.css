@@ -33,7 +33,7 @@
 .prose h5 {
   font-weight: var(--font-weight-bold);
   line-height: 1.75;
-  margin: 2em 0 0.5em 0;
+  margin: 1.75em 0 0.25em 0;
 }
 
 .prose h1 {

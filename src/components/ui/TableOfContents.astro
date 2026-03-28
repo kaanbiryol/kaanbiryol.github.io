@@ -179,8 +179,14 @@ const { toc = [] }: TOCProps = Astro.props
       })
     }
 
-    document.addEventListener('astro:page-load', () => { cleanup(); init() })
-    document.addEventListener('astro:after-swap', () => { cleanup(); init() })
+    document.addEventListener('astro:page-load', () => {
+      cleanup()
+      init()
+    })
+    document.addEventListener('astro:after-swap', () => {
+      cleanup()
+      init()
+    })
     document.addEventListener('DOMContentLoaded', () => {
       if (!state.container || !state.hasContent) init()
     })
@@ -244,7 +250,10 @@ const { toc = [] }: TOCProps = Astro.props
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-    transition: color 0.2s ease-out, opacity 0.2s ease-out, font-weight 0.2s ease-out;
+    transition:
+      color 0.2s ease-out,
+      opacity 0.2s ease-out,
+      font-weight 0.2s ease-out;
     cursor: pointer;
   }
 

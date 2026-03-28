@@ -85,6 +85,14 @@
   margin: 1.75em 0;
 }
 
+.prose h1 + p,
+.prose h2 + p,
+.prose h3 + p,
+.prose h4 + p,
+.prose h5 + p {
+  margin-top: 0.5em;
+}
+
 /* Tables */
 .prose table {
   table-layout: fixed;

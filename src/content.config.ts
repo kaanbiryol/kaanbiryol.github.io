@@ -5,7 +5,10 @@ import { publicationConfig } from './config'
 
 const posts = defineCollection({
   // Load Markdown and MDX files in the `src/content/posts/` directory.
-  loader: glob({ base: './src/content/posts', pattern: publicationConfig.publishPosts ? '**/*.{md,mdx}' : '_*.{md,mdx}' }),
+  loader: glob({
+    base: './src/content/posts',
+    pattern: publicationConfig.publishPosts ? '**/*.{md,mdx}' : '_*.{md,mdx}'
+  }),
   // Type-check frontmatter using a schema
   schema: () =>
     z.object({

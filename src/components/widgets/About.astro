@@ -7,9 +7,7 @@ const hasContent = aboutEntry?.body ? aboutEntry.body.replace(/<!--[\s\S]*?-->/g
 const aboutHtml = hasContent && aboutEntry ? aboutEntry.rendered?.html : null
 ---
 
-{
-  hasContent && aboutHtml && <div class="about prose" set:html={aboutHtml} />
-}
+{hasContent && aboutHtml && <div class="about prose" set:html={aboutHtml} />}
 
 <style>
   .about:not(:empty) {

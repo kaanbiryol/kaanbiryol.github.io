@@ -6,7 +6,7 @@ export const themeConfig: ThemeConfig = {
     website: 'https://kaanbiryol.github.io/', // Site domain
     title: 'Kaan Biryol', // Site title
     author: 'Kaan Biryol', // Author name
-    description: 'iOS platform engineering, build systems, and developer tooling', // Site description
+    description: 'Mobile Platform Engineer building faster, more reliable infrastructure for iOS teams', // Site description
     language: 'en-US' // Default language
   },
 
@@ -35,4 +35,10 @@ export const themeConfig: ThemeConfig = {
     copyCode: true, // Enable copy button in code blocks
     linkCard: false // Disabled for static GitHub Pages deployment
   }
+}
+
+export const publicationConfig = {
+  publishPosts: false,
+  showWriting: true,
+  showWork: true
 }

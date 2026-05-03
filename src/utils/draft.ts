@@ -1,9 +1,14 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
+import { publicationConfig } from '@/config'
 
 /**
  * Get all posts, filtering out posts whose filenames start with _
  */
 export async function getFilteredPosts() {
+  if (!publicationConfig.publishPosts) {
+    return []
+  }
+
   const posts = await getCollection('posts')
   return posts.filter((post: CollectionEntry<'posts'>) => !post.id.startsWith('_'))
 }

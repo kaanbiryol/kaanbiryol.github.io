@@ -5,7 +5,7 @@ import { Feed } from 'feed'
 import MarkdownIt from 'markdown-it'
 import { parse as htmlParser } from 'node-html-parser'
 import sanitizeHtml from 'sanitize-html'
-import { themeConfig } from '@/config'
+import { publicationConfig, themeConfig } from '@/config'
 import path from 'node:path'
 
 const markdownParser = new MarkdownIt({
@@ -116,6 +116,10 @@ async function generateFeedInstance(context: APIContext) {
       link: siteUrl
     }
   })
+
+  if (!publicationConfig.publishPosts) {
+    return feed
+  }
 
   const posts = await getCollection('posts', ({ id }: CollectionEntry<'posts'>) => !id.startsWith('_'))
   const sortedPosts = posts.sort(

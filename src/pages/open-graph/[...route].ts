@@ -1,16 +1,18 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import { OGImageRoute } from 'astro-og-canvas'
-import { themeConfig } from '../../config'
+import { publicationConfig, themeConfig } from '../../config'
 
 export const prerender = true
 
-const collectionEntries = await getCollection('posts')
+const collectionEntries = publicationConfig.publishPosts ? await getCollection('posts') : []
 
 // Map the array of content collection entries to create an object.
 // Converts [{ id: 'post.md', data: { title: 'Example', pubDate: Date } }]
 // to { 'post.md': { title: 'Example', pubDate: Date } }
 const pages = Object.fromEntries(
-  collectionEntries.map((entry: CollectionEntry<'posts'>) => [entry.id.replace(/\.(md|mdx)$/, ''), entry.data])
+  collectionEntries
+    .filter((entry: CollectionEntry<'posts'>) => !entry.id.startsWith('_'))
+    .map((entry: CollectionEntry<'posts'>) => [entry.id.replace(/\.(md|mdx)$/, ''), entry.data])
 )
 
 export const { getStaticPaths, GET } = await OGImageRoute({

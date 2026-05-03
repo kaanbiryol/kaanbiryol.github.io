@@ -1,12 +1,33 @@
 ---
-import { themeConfig } from '@/config'
+import { publicationConfig, themeConfig } from '@/config'
 import ThemeToggle from '@/components/ui/ThemeToggle.astro'
+
+const navLinks = [
+  ...(publicationConfig.showWork ? [{ label: 'Work', href: '/work/' }] : []),
+  ...(publicationConfig.showWriting ? [{ label: 'Writing', href: '/writing/' }] : [])
+]
+const hasNavActions = navLinks.length > 0 || themeConfig.general.themeToggle
 ---
 
 <header>
   <nav>
-    <a href="/">{themeConfig.site.title}</a>
-    {themeConfig.general.themeToggle && <ThemeToggle />}
+    <a class="site-title" href="/">{themeConfig.site.title}</a>
+    {
+      hasNavActions && (
+        <div class="nav-actions">
+          {navLinks.length > 0 && (
+            <div class="nav-links" aria-label="Main navigation">
+              {navLinks.map((link) => (
+                <a href={link.href} aria-current={Astro.url.pathname === link.href ? 'page' : undefined}>
+                  {link.label}
+                </a>
+              ))}
+            </div>
+          )}
+          {themeConfig.general.themeToggle && <ThemeToggle />}
+        </div>
+      )
+    }
   </nav>
 </header>
 <style>
@@ -17,12 +38,54 @@ import ThemeToggle from '@/components/ui/ThemeToggle.astro'
     display: flex;
     justify-content: space-between;
     align-items: center;
+    gap: 1.5rem;
   }
   header a {
     font-weight: var(--font-weight-bold);
     color: var(--text-primary);
     text-decoration: none;
-    min-width: 3rem;
     display: inline-block;
+  }
+
+  .site-title {
+    min-width: 3rem;
+  }
+
+  .nav-actions,
+  .nav-links {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-actions {
+    gap: 1rem;
+  }
+
+  .nav-links {
+    gap: 1.25rem;
+  }
+
+  .nav-links a {
+    color: var(--text-secondary);
+    font-weight: var(--font-weight-regular);
+    white-space: nowrap;
+    transition: color 0.2s ease-out;
+  }
+
+  .nav-links a:hover,
+  .nav-links a[aria-current='page'] {
+    color: var(--text-primary);
+  }
+
+  @media (max-width: 420px) {
+    nav {
+      align-items: flex-start;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .nav-links {
+      gap: 1rem;
+    }
   }
 </style>

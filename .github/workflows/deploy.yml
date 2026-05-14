@@ -26,6 +26,8 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install
+      - run: pnpm format:check
+      - run: pnpm lint:md
       - run: pnpm build
       - uses: actions/upload-pages-artifact@v5
         with:

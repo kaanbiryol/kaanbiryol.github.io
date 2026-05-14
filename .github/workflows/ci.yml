@@ -6,7 +6,6 @@ on:
     paths-ignore: &paths-ignore
       - 'LICENSE'
       - '.gitignore'
-      - '**/*.md'
       - '**/*.png'
       - '**/*.jpg'
       - '**/*.jpeg'
@@ -51,6 +50,9 @@ jobs:
 
       - name: Format check
         run: pnpm format:check
+
+      - name: Markdown lint
+        run: pnpm lint:md
 
       - name: Lint
         run: pnpm lint

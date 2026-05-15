@@ -1,4 +1,7 @@
 import type { ThemeConfig } from './types'
+import process from 'node:process'
+
+const previewPost = process.env.PREVIEW_POST?.trim().replace(/\.(md|mdx)$/, '') || undefined
 
 export const themeConfig: ThemeConfig = {
   // SITE INFO ///////////////////////////////////////////////////////////////////////////////////////////
@@ -38,7 +41,8 @@ export const themeConfig: ThemeConfig = {
 }
 
 export const publicationConfig = {
-  publishPosts: false,
+  publishPosts: true,
+  previewPost,
   showWriting: true,
   showWork: true
 }

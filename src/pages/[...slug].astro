@@ -5,13 +5,14 @@ import { render } from 'astro:content'
 import { publicationConfig } from '@/config'
 
 export async function getStaticPaths() {
-  if (!publicationConfig.publishPosts) {
+  if (!publicationConfig.publishPosts && !publicationConfig.previewPost) {
     return []
   }
 
   const posts = await getCollection('posts')
   return posts
     .filter((post) => !post.id.startsWith('_'))
+    .filter((post) => !publicationConfig.previewPost || post.id === publicationConfig.previewPost)
     .map((post) => ({
       params: { slug: post.id },
       props: post

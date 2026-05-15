@@ -5,12 +5,15 @@ import { publicationConfig } from '@/config'
  * Get all posts, filtering out posts whose filenames start with _
  */
 export async function getFilteredPosts() {
-  if (!publicationConfig.publishPosts) {
+  if (!publicationConfig.publishPosts && !publicationConfig.previewPost) {
     return []
   }
 
   const posts = await getCollection('posts')
-  return posts.filter((post: CollectionEntry<'posts'>) => !post.id.startsWith('_'))
+  return posts.filter(
+    (post: CollectionEntry<'posts'>) =>
+      !post.id.startsWith('_') && (!publicationConfig.previewPost || post.id === publicationConfig.previewPost)
+  )
 }
 
 /**

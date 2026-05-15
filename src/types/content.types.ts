@@ -19,4 +19,5 @@ export interface TOCItem {
 // PostList component props interface
 export interface PostListProps {
   posts: CollectionEntry<'posts'>[]
+  bottomSpace?: boolean
 }

@@ -3,11 +3,17 @@ import { defineCollection } from 'astro:content'
 import { z } from 'astro/zod'
 import { publicationConfig } from './config'
 
+const postPattern = publicationConfig.publishPosts
+  ? '**/*.{md,mdx}'
+  : publicationConfig.previewPost
+    ? `${publicationConfig.previewPost}.{md,mdx}`
+    : '_*.{md,mdx}'
+
 const posts = defineCollection({
   // Load Markdown and MDX files in the `src/content/posts/` directory.
   loader: glob({
     base: './src/content/posts',
-    pattern: publicationConfig.publishPosts ? '**/*.{md,mdx}' : '_*.{md,mdx}'
+    pattern: postPattern
   }),
   // Type-check frontmatter using a schema
   schema: () =>

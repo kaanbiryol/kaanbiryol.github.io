@@ -1,38 +1,60 @@
 ---
 import FormattedDate from '@/components/widgets/FormattedDate.astro'
 import type { PostListProps } from '@/types'
-import { themeConfig } from '@/config'
+import { renderInlineMarkdown } from '@/utils/inline-markdown'
 
-const { posts } = Astro.props as PostListProps
+const { posts, bottomSpace = true } = Astro.props as PostListProps
+
+const stripMarkdown = (text: string) =>
+  text
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/`([^`]+)`/g, '$1')
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/[*_#>~]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim()
+
+const trimExcerpt = (text: string, maxLength = 150) => {
+  if (text.length <= maxLength) return text
+
+  const trimmed = text.slice(0, maxLength - 3).replace(/\s+\S*$/, '')
+  return `${trimmed}...`
+}
+
+const getExcerpt = (body?: string) => {
+  const paragraph = (body ?? '')
+    .split(/\n{2,}/)
+    .map((block) => block.trim())
+    .find((block) => block && !block.startsWith('```') && !block.startsWith('#') && !block.startsWith('- '))
+
+  return paragraph ? trimExcerpt(stripMarkdown(paragraph)) : ''
+}
 ---
 
 <ul>
   {
-    posts.map((post) => (
-      <li>
-        <a href={`/${post.id}/`}>
-          <div class={`post-item ${!themeConfig.date.dateOnRight ? 'date-left' : ''}`}>
-            {!themeConfig.date.dateOnRight && (
+    posts.map((post) => {
+      const description = post.data.description ?? getExcerpt(post.body)
+
+      return (
+        <li>
+          <a href={`/${post.id}/`}>
+            <article class="post-item">
+              <div class="post-copy">
+                <h3 class="title" set:html={renderInlineMarkdown(post.data.title)} />
+                {description && <p class="description" set:html={renderInlineMarkdown(description)} />}
+              </div>
               <p class="date font-features">
                 <FormattedDate date={post.data.pubDate} context="list" />
               </p>
-            )}
-            <p class="title">{post.data.title}</p>
-            {themeConfig.date.dateOnRight && (
-              <div class={themeConfig.general.postListDottedDivider ? 'dotted-divider' : 'divider'} />
-            )}
-            {themeConfig.date.dateOnRight && (
-              <p class="date font-features">
-                <FormattedDate date={post.data.pubDate} context="list" />
-              </p>
-            )}
-          </div>
-        </a>
-      </li>
-    ))
+            </article>
+          </a>
+        </li>
+      )
+    })
   }
 </ul>
-<div class="placeholder"></div>
+{bottomSpace && <div class="placeholder" />}
 
 <style>
   ul {
@@ -41,7 +63,18 @@ const { posts } = Astro.props as PostListProps
     list-style-type: none;
     display: flex;
     flex-direction: column;
-    gap: 0;
+  }
+
+  li {
+    border-top: 1px solid var(--border);
+  }
+
+  li:first-child {
+    border-top: 0;
+  }
+
+  li:last-child {
+    border-bottom: 1px solid var(--border);
   }
 
   a {
@@ -59,52 +92,46 @@ const { posts } = Astro.props as PostListProps
     ul:hover a:hover {
       opacity: 1;
     }
-
-    ul:hover a:hover .divider {
-      background-color: var(--text-tertiary);
-      opacity: 0.75;
-    }
-    ul:hover a:hover .dotted-divider {
-      color: var(--text-secondary);
-    }
-    ul:hover a:hover .date {
-      color: var(--text-secondary);
-      opacity: 1;
-    }
   }
 
   .post-item {
-    height: 2.75rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 0.75rem;
-  }
-
-  .post-item.date-left {
-    justify-content: flex-start;
-  }
-
-  .post-item.date-left .title {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  .post-item.date-left .date {
-    margin-right: 0.75rem;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: start;
+    padding: 0.95rem 0;
   }
 
   .title {
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.55;
     margin: 0;
-    flex-shrink: 1;
-    min-width: 0;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
+  }
+
+  .description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.6;
+    margin: 0.25rem 0 0;
+  }
+
+  .title :global(code),
+  .description :global(code) {
+    padding: 1.5px 3px;
+    border-radius: 4px;
+    background-color: var(--code-bg);
+    border: 0.5px solid var(--border);
+    font-family: var(--mono);
+    font-size: 0.9em;
+    font-weight: inherit;
+    font-feature-settings:
+      'liga' 0,
+      'calt' 0;
   }
 
   .date {
-    margin: 0;
+    margin: 0.1rem 0 0;
     color: var(--text-secondary);
     opacity: 0.75;
     letter-spacing: var(--spacing-s);
@@ -112,32 +139,18 @@ const { posts } = Astro.props as PostListProps
     white-space: nowrap;
   }
 
-  .divider {
-    flex: 1 1 auto;
-    min-width: 3rem;
-    margin: 0 0.25rem;
-    height: 0.5px;
-    background-color: var(--border);
-  }
-
-  .dotted-divider {
-    flex: 1 1 3rem;
-    min-width: 3rem;
-    max-width: 100%;
-    text-align: end;
-    letter-spacing: 5px;
-    height: 1.675rem;
-    overflow: hidden;
-    color: var(--text-tertiary);
-    opacity: 0.75;
-  }
-
-  .dotted-divider::after {
-    content: '·····························································································································································';
-    pointer-events: none;
-  }
-
   .placeholder {
     height: 3rem;
+  }
+
+  @media (max-width: 620px) {
+    .post-item {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
+    }
+
+    .date {
+      margin-top: 0;
+    }
   }
 </style>

@@ -4,7 +4,8 @@ import { publicationConfig, themeConfig } from '../../config'
 
 export const prerender = true
 
-const collectionEntries = publicationConfig.publishPosts ? await getCollection('posts') : []
+const collectionEntries =
+  publicationConfig.publishPosts || publicationConfig.previewPost ? await getCollection('posts') : []
 
 // Map the array of content collection entries to create an object.
 // Converts [{ id: 'post.md', data: { title: 'Example', pubDate: Date } }]
@@ -12,6 +13,9 @@ const collectionEntries = publicationConfig.publishPosts ? await getCollection('
 const pages = Object.fromEntries(
   collectionEntries
     .filter((entry: CollectionEntry<'posts'>) => !entry.id.startsWith('_'))
+    .filter(
+      (entry: CollectionEntry<'posts'>) => !publicationConfig.previewPost || entry.id === publicationConfig.previewPost
+    )
     .map((entry: CollectionEntry<'posts'>) => [entry.id.replace(/\.(md|mdx)$/, ''), entry.data])
 )
 

@@ -509,14 +509,14 @@
 .prose pre {
   background-color: var(--astro-code-background);
   border-radius: 8px;
-  padding: 1.25em 1.5em;
-  margin: 2em 0;
+  padding: 1em 1.25em;
+  margin: 1.25em 0;
   overflow-x: auto;
 }
 
 @media (max-width: 768px) {
   .prose pre {
-    padding: 1em 1.25em;
+    padding: 0.875em 1em;
   }
 }
 
@@ -539,6 +539,145 @@
 
 .prose pre > code * {
   font-size: var(--font-size-s);
+}
+
+/* Mermaid diagrams */
+.prose .mermaid {
+  margin: 1.25em 0;
+  overflow-x: auto;
+  position: relative;
+  text-align: center;
+}
+
+.prose .mermaid > svg {
+  display: inline-block;
+  height: auto;
+  max-width: none;
+  min-width: 88rem;
+}
+
+@media (max-width: 768px) {
+  .prose .mermaid > svg {
+    min-width: 88rem;
+  }
+}
+
+.mermaid-actions {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  z-index: 2;
+  display: flex;
+  gap: 0.35rem;
+}
+
+.mermaid-action-button {
+  width: 2rem;
+  height: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--border);
+  border-radius: 0.375rem;
+  background: var(--bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+  opacity: 0.88;
+  transition:
+    color 0.15s ease-out,
+    opacity 0.15s ease-out,
+    background-color 0.15s ease-out;
+}
+
+.mermaid-action-button:hover,
+.mermaid-action-button:focus-visible {
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+.mermaid-action-button svg {
+  flex-shrink: 0;
+  width: 0.875rem;
+  height: 0.875rem;
+  max-width: 0.875rem;
+  min-width: 0;
+}
+
+.diagram-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: color-mix(in srgb, var(--bg) 92%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: opacity 0.15s ease-in-out;
+}
+
+.diagram-viewer.active {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.diagram-viewer-surface {
+  max-width: calc(100vw - 2rem);
+  max-height: calc(100vh - 2rem);
+  overflow: auto;
+}
+
+.diagram-viewer-surface img {
+  display: block;
+  width: 96rem;
+  max-width: none;
+  height: auto;
+}
+
+.diagram-viewer-close {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 1;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg);
+  color: var(--text-secondary);
+  cursor: pointer;
+}
+
+.diagram-viewer-close::before,
+.diagram-viewer-close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.875rem;
+  height: 1.5px;
+  background: currentColor;
+  transform-origin: center;
+}
+
+.diagram-viewer-close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.diagram-viewer-close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+.diagram-viewer-close:hover,
+.diagram-viewer-close:focus-visible {
+  color: var(--text-primary);
+}
+
+body.diagram-viewer-open {
+  overflow: hidden;
 }
 
 /* KaTeX Math Rendering */

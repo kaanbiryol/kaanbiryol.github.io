@@ -2,10 +2,63 @@
 import IndexLayout from '@/layouts/IndexLayout.astro'
 import About from '@/components/widgets/About.astro'
 import ContactLinks from '@/components/widgets/ContactLinks.astro'
+import PostList from '@/components/widgets/PostList.astro'
 import { themeConfig } from '@/config'
+import { getSortedFilteredPosts } from '@/utils/draft'
+
+const latestPosts = (await getSortedFilteredPosts()).slice(0, 5)
 ---
 
 <IndexLayout title={themeConfig.site.title} description={themeConfig.site.description}>
   <About />
   <ContactLinks />
+  {
+    latestPosts.length > 0 && (
+      <section class="latest-writing" aria-labelledby="latest-writing-heading">
+        <div class="section-header">
+          <h2 id="latest-writing-heading">Latest Writing</h2>
+          <a href="/writing/">All writing</a>
+        </div>
+        <PostList posts={latestPosts} bottomSpace={false} />
+      </section>
+    )
+  }
 </IndexLayout>
+
+<style>
+  .latest-writing {
+    margin-top: 2.75rem;
+  }
+
+  .section-header {
+    align-items: baseline;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 0.875rem;
+  }
+
+  h2 {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .section-header a {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    text-decoration: underline;
+    text-decoration-color: var(--text-tertiary);
+    transition:
+      color 0.2s ease-out,
+      text-decoration-color 0.2s ease-out;
+    white-space: nowrap;
+  }
+
+  .section-header a:hover {
+    color: var(--text-primary);
+    text-decoration-color: var(--text-primary);
+  }
+</style>

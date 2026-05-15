@@ -140,6 +140,13 @@ const ogImage = `/open-graph/${postSlug}.png`
         stroke: var(--mermaid-node-border) !important;
       }
     `
+    const mermaidCSSVariables = [
+      '--mermaid-node-bg',
+      '--mermaid-node-border',
+      '--mermaid-node-text',
+      '--mermaid-edge',
+      '--mermaid-label-bg'
+    ]
 
     const getMermaidTheme = () => {
       const style = getComputedStyle(document.documentElement)
@@ -175,6 +182,19 @@ const ogImage = `/open-graph/${postSlug}.png`
       }
     }
 
+    const cloneDiagramSvg = (svg) => {
+      const clone = svg.cloneNode(true)
+      const diagram = svg.closest('.mermaid')
+      const style = getComputedStyle(diagram || document.documentElement)
+
+      mermaidCSSVariables.forEach((name) => {
+        const value = style.getPropertyValue(name).trim()
+        if (value) clone.style.setProperty(name, value)
+      })
+
+      return clone
+    }
+
     const viewer = document.getElementById('diagram-viewer')
     const viewerImg = document.getElementById('diagram-viewer-img')
     const viewerClose = viewer?.querySelector('.diagram-viewer-close')
@@ -190,7 +210,7 @@ const ogImage = `/open-graph/${postSlug}.png`
 
     const showDiagram = (svg) => {
       if (!viewer || !(viewerImg instanceof HTMLImageElement)) return
-      const source = new XMLSerializer().serializeToString(svg)
+      const source = new XMLSerializer().serializeToString(cloneDiagramSvg(svg))
       viewerImg.src = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(source)}`
       viewer.classList.add('active')
       viewer.setAttribute('aria-hidden', 'false')

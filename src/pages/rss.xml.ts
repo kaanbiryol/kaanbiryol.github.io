@@ -1,4 +1,5 @@
 import type { APIContext } from 'astro'
+import type { CollectionEntry } from 'astro:content'
 import rss from '@astrojs/rss'
 import { themeConfig } from '@/config'
 import { getSortedFilteredPosts } from '@/utils/draft'
@@ -12,7 +13,7 @@ export async function GET(context: APIContext) {
     site: context.site ?? themeConfig.site.website,
     stylesheet: '/feeds/rss-style.xsl',
     customData: `<language>${themeConfig.site.language}</language>`,
-    items: posts.map((post) => ({
+    items: posts.map((post: CollectionEntry<'posts'>) => ({
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,

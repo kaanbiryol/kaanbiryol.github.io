@@ -93,6 +93,87 @@ const ogImage = `/open-graph/${postSlug}.png`
         <path d="M13.78 4.22a.75.75 0 0 1 0 1.06l-7.25 7.25a.75.75 0 0 1-1.06 0L2.22 9.28a.751.751 0 0 1 .018-1.042.751.751 0 0 1 1.042-.018L6 10.94l6.72-6.72a.75.75 0 0 1 1.06 0Z"></path>
       </svg>
     `
+    const mermaidThemeCSS = `
+      .node rect,
+      .node circle,
+      .node ellipse,
+      .node polygon,
+      .node path {
+        fill: var(--mermaid-node-bg) !important;
+        stroke: var(--mermaid-node-border) !important;
+        stroke-width: 1.25px !important;
+      }
+
+      .nodeLabel,
+      .nodeLabel p,
+      .label,
+      .label text,
+      .label span,
+      .cluster-label text,
+      .cluster-label span {
+        color: var(--mermaid-node-text) !important;
+        fill: var(--mermaid-node-text) !important;
+      }
+
+      .edgePath .path,
+      path.flowchart-link,
+      .flowchart-link {
+        stroke: var(--mermaid-edge) !important;
+        stroke-width: 1.25px !important;
+      }
+
+      .arrowheadPath {
+        fill: var(--mermaid-edge) !important;
+        stroke: var(--mermaid-edge) !important;
+      }
+
+      .edgeLabel,
+      .edgeLabel p,
+      .edgeLabel rect,
+      .labelBkg {
+        background: var(--mermaid-label-bg) !important;
+        fill: var(--mermaid-label-bg) !important;
+      }
+
+      .cluster rect {
+        fill: transparent !important;
+        stroke: var(--mermaid-node-border) !important;
+      }
+    `
+
+    const getMermaidTheme = () => {
+      const style = getComputedStyle(document.documentElement)
+      const getColor = (name, fallback) => style.getPropertyValue(name).trim() || fallback
+      const bg = getColor('--bg', '#ffffff')
+      const codeBg = getColor('--code-bg', 'rgba(0, 0, 0, 0.04)')
+      const textPrimary = getColor('--text-primary', 'rgba(0, 0, 0, 0.85)')
+      const textTertiary = getColor('--text-tertiary', 'rgba(0, 0, 0, 0.24)')
+      const border = getColor('--border', 'rgba(0, 0, 0, 0.1)')
+
+      return {
+        startOnLoad: false,
+        theme: 'base',
+        themeCSS: mermaidThemeCSS,
+        themeVariables: {
+          background: bg,
+          primaryColor: codeBg,
+          primaryTextColor: textPrimary,
+          primaryBorderColor: border,
+          lineColor: textTertiary,
+          secondaryColor: codeBg,
+          tertiaryColor: bg,
+          edgeLabelBackground: bg,
+          mainBkg: codeBg,
+          nodeBorder: border,
+          clusterBkg: bg,
+          clusterBorder: border,
+          titleColor: textPrimary,
+          fontFamily: getColor('--sans', 'Inter, sans-serif'),
+          fontSize: '15px',
+          darkMode: document.documentElement.classList.contains('dark')
+        }
+      }
+    }
 
     const viewer = document.getElementById('diagram-viewer')
     const viewerImg = document.getElementById('diagram-viewer-img')
@@ -193,8 +274,7 @@ const ogImage = `/open-graph/${postSlug}.png`
       return
     }
     const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')
-    const isDark = document.documentElement.classList.contains('dark')
-    mermaid.initialize({ startOnLoad: false, theme: isDark ? 'dark' : 'default' })
+    mermaid.initialize(getMermaidTheme())
     for (const block of blocks) {
       const code = block.querySelector('code')?.textContent || ''
       const wrapper = document.createElement('div')

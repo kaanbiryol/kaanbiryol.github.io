@@ -17,7 +17,7 @@
 
 /* Post title section */
 .prose .title {
-  margin-bottom: 2.5em;
+  margin-bottom: 1em;
 }
 
 .prose .title h1 {
@@ -543,8 +543,15 @@
 
 /* Mermaid diagrams */
 .prose .mermaid {
+  --mermaid-node-bg: var(--code-bg);
+  --mermaid-node-border: var(--border);
+  --mermaid-node-text: var(--text-primary);
+  --mermaid-edge: var(--text-tertiary);
+  --mermaid-label-bg: var(--bg);
+
   margin: 1.25em 0;
   overflow-x: auto;
+  padding-top: 2.75rem;
   position: relative;
   text-align: center;
 }

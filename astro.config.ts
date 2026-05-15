@@ -1,5 +1,4 @@
 import { defineConfig } from 'astro/config'
-import mdx from '@astrojs/mdx'
 import sitemap from '@astrojs/sitemap'
 import remarkMath from 'remark-math'
 import remarkDirective from 'remark-directive'
@@ -34,7 +33,7 @@ export default defineConfig({
     remarkPlugins: [remarkMath, remarkDirective, remarkEmbeddedMedia, remarkReadingTime, remarkTOC],
     rehypePlugins: [rehypeKatex, rehypeCleanup, rehypeImageProcessor, rehypeCopyCode]
   },
-  integrations: [mdx(), sitemap()],
+  integrations: [sitemap()],
   vite: {
     resolve: {
       alias: {

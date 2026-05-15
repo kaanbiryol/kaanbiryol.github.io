@@ -16,7 +16,7 @@ const pages = Object.fromEntries(
     .filter(
       (entry: CollectionEntry<'posts'>) => !publicationConfig.previewPost || entry.id === publicationConfig.previewPost
     )
-    .map((entry: CollectionEntry<'posts'>) => [entry.id.replace(/\.(md|mdx)$/, ''), entry.data])
+    .map((entry: CollectionEntry<'posts'>) => [entry.id.replace(/\.md$/, ''), entry.data])
 )
 
 export const { getStaticPaths, GET } = await OGImageRoute({

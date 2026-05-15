@@ -5,11 +5,9 @@ updates:
     schedule:
       interval: 'weekly'
       day: 'monday'
-    assignees:
-      - 'the3ash'
     commit-message:
-      prefix: 'deps'
-      prefix-development: 'dev'
+      prefix: 'build'
+      prefix-development: 'build'
       include: 'scope'
     labels:
       - 'dependencies'
@@ -66,8 +64,6 @@ updates:
     schedule:
       interval: 'weekly'
       day: 'monday'
-    assignees:
-      - 'the3ash'
     commit-message:
       prefix: 'ci'
       include: 'scope'

@@ -1,7 +1,7 @@
 import type { ThemeConfig } from './types'
 import process from 'node:process'
 
-const previewPost = process.env.PREVIEW_POST?.trim().replace(/\.(md|mdx)$/, '') || undefined
+const previewPost = process.env.PREVIEW_POST?.trim().replace(/\.md$/, '') || undefined
 
 export const themeConfig: ThemeConfig = {
   // SITE INFO ///////////////////////////////////////////////////////////////////////////////////////////
@@ -35,8 +35,7 @@ export const themeConfig: ThemeConfig = {
     readingTime: false, // Show reading time in posts
     toc: true, // Show table of contents (when there is enough page width)
     imageViewer: true, // Enable image viewer
-    copyCode: true, // Enable copy button in code blocks
-    linkCard: false // Disabled for static GitHub Pages deployment
+    copyCode: true // Enable copy button in code blocks
   }
 }
 

@@ -5,8 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "astro dev",
-    "prebuild": "pnpm exec tsx scripts/toggle-proxy.ts",
-    "build": "pnpm run typecheck && pnpm run prebuild && astro build",
+    "build": "pnpm run typecheck && astro build",
     "typecheck": "pnpm run typecheck:ts && astro check",
     "typecheck:ts": "tsc --noEmit",
     "preview": "astro preview",
@@ -21,18 +20,14 @@
     "update-theme": "tsx scripts/update-theme.ts"
   },
   "dependencies": {
-    "@astrojs/mdx": "^5.0.4",
-    "@astrojs/netlify": "^7.0.8",
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
     "astro": "^6.2.1",
     "astro-og-canvas": "^0.11.1",
     "canvaskit-wasm": "^0.41.1",
-    "feed": "^5.2.1",
     "katex": "^0.16.45",
     "markdown-it": "^14.1.1",
     "mdast-util-to-string": "^4.0.0",
-    "node-html-parser": "^7.1.0",
     "reading-time": "^1.5.0",
     "rehype-katex": "^7.0.1",
     "remark-directive": "^4.0.0",

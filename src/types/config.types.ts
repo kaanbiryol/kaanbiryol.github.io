@@ -33,7 +33,6 @@ export interface PostSettings {
   toc: boolean
   imageViewer: boolean
   copyCode: boolean
-  linkCard: boolean
 }
 
 // Theme configuration type

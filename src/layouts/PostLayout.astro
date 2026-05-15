@@ -11,7 +11,6 @@ import GradientMask from '@/components/ui/GradientMask.astro'
 import ImageOptimizer from '@/components/ui/ImageOptimizer.astro'
 import ImageViewer from '@/components/ui/ImageViewer.astro'
 import GitHubCard from '@/components/ui/GitHubCard.astro'
-import LinkCard from '@/components/ui/LinkCard.astro'
 import NeoDBCard from '@/components/ui/NeoDBCard.astro'
 import XPOST from '@/components/ui/XPOST.astro'
 import CopyCode from '@/components/ui/CopyCode.astro'
@@ -66,7 +65,6 @@ const ogImage = `/open-graph/${postSlug}.png`
     <XPOST />
     <NeoDBCard />
     {themeConfig.post.imageViewer && <ImageViewer />}
-    {themeConfig.post.linkCard && <LinkCard />}
     {themeConfig.general.footer && <Footer />}
   </div>
   <div id="diagram-viewer" class="diagram-viewer" aria-hidden="true">

@@ -57,7 +57,7 @@ If we could somehow ask the compiler for the resolved type, we could match that 
 
 ## A small benchmark
 
-Before spending more time on tooling, I wanted benchmark different expression shapes to understand which ones get slower and which ones do not.
+Before spending more time on tooling, I wanted to benchmark different expression shapes to understand which ones get slower and which ones do not.
 
 I created a small benchmark repo, [swift-type-checking-benchmarks](https://github.com/kaanbiryol/swift-type-checking-benchmarks), where different expression shapes can be generated and measured. The benchmark creates repeated Swift files and runs `xcrun swiftc -typecheck` through [`hyperfine`](https://github.com/sharkdp/hyperfine).
 
@@ -272,6 +272,20 @@ doSomethingArrayOptional(model: [
 
 I am sure there are more edge cases. Optionals and arrays were just the first ones I ran into.
 
+## Not just initializers
+
+I focused on `.init(...)` in this post because that was the repeated pattern in front of me. The underlying problem is not specific to initializers.
+
+Any expression that leaves the compiler with too much ambiguity can create similar work.
+
+The same approach still applies to those cases:
+
+1. Measure slow expression shapes.
+2. Find the repeated pattern.
+3. Use SourceKit to grab explicit type information.
+4. Replace.
+5. Profit at scale.
+
 ## The example project
 
 The [init-revise-cli repo](https://github.com/kaanbiryol/init-revise-cli) includes an [`Example/`](https://github.com/kaanbiryol/init-revise-cli/tree/main/Example) project, that you can see how everything comes together.
@@ -286,7 +300,7 @@ That is not enough to make this a universal recommendation. But for a repeated s
 
 ## Tips
 
-Before rewriting anything, measure where the compiler is spending time.
+Before rewriting anything, measure where the compiler is spending time. The slow type-checking flags are still practical tools for this; they are not just old compiler trivia.
 
 Swift compiler has [frontend flags](https://github.com/swiftlang/swift/blob/main/include/swift/Option/FrontendOptions.td) for slow type-checking diagnostics:
 

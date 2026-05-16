@@ -22,17 +22,17 @@
   "dependencies": {
     "@astrojs/rss": "^4.0.18",
     "@astrojs/sitemap": "^3.7.2",
-    "astro": "^6.2.1",
+    "astro": "^6.3.3",
     "astro-og-canvas": "^0.11.1",
     "canvaskit-wasm": "^0.41.1",
-    "katex": "^0.16.45",
+    "katex": "^0.16.47",
     "markdown-it": "^14.1.1",
     "mdast-util-to-string": "^4.0.0",
     "reading-time": "^1.5.0",
     "rehype-katex": "^7.0.1",
     "remark-directive": "^4.0.0",
     "remark-math": "^6.0.0",
-    "sanitize-html": "^2.17.3",
+    "sanitize-html": "^2.17.4",
     "sharp": "^0.34.5",
     "unist-util-visit": "^5.1.0"
   },
@@ -41,9 +41,9 @@
     "@eslint/js": "^10.0.1",
     "@types/markdown-it": "^14.1.2",
     "@types/sanitize-html": "^2.16.1",
-    "@typescript-eslint/eslint-plugin": "^8.59.1",
-    "@typescript-eslint/parser": "^8.59.1",
-    "eslint": "^10.3.0",
+    "@typescript-eslint/eslint-plugin": "^8.59.3",
+    "@typescript-eslint/parser": "^8.59.3",
+    "eslint": "^10.4.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-astro": "^1.7.0",
     "globals": "^17.6.0",
@@ -55,8 +55,13 @@
     "remark-lint-table-cell-padding": "^5.1.1",
     "remark-preset-lint-consistent": "^6.0.1",
     "remark-preset-lint-recommended": "^7.0.1",
-    "tsx": "^4.21.0",
+    "tsx": "^4.22.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.59.1"
+    "typescript-eslint": "^8.59.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "yaml": "2.9.0"
+    }
   }
 }

@@ -6,11 +6,11 @@ pubDate: 2026-05-17
 
 ## Introduction
 
-Swift’s `.init(...)` shorthand is handy. It keeps call sites short, avoids repeating type names that already feel obvious, and often makes Swift code nicer to read.
+Swift's `.init(...)` shorthand is convenient. It keeps call sites short, avoids repeating type names that already feel obvious, and arguably makes Swift code nicer to read.
 
-But the convenience is not always free.
+But this convenience is not always free.
 
-In large Swift codebases, `.init(...)` can show up thousands of times. Most of those call sites are harmless. Some are not.
+In large Swift codebases, `.init(...)` can show up thousands of times. Some of those call sites are harmless. Some are not.
 
 ## Type inference
 
@@ -32,11 +32,11 @@ There is no `ViewModel` written at the call site. A human can still read this an
 
 The compiler has to prove the same thing.
 
-Swift’s type inference is one of the things that makes the language pleasant to use. But inference has a cost. That cost depends on the surrounding expression, overload sets, generic constraints, and how early the type checker gets useful information.
+Swift’s type inference is one of the things that makes the language pleasant to use. But inference can have a compile-time cost.
 
 ## The problem
 
-In the project I was working on, one specific `.init(...)` pattern appeared thousands of times, and the compiler was spending a lot of time inferring its type.
+In the project I was working on, one specific `.init(...)` pattern appeared thousands of times, and type-checking diagnostics showed that the compiler was spending noticeable time on that expression shape.
 
 The goal was simple: make those initializer calls explicit where inference was costing us time.
 
@@ -51,19 +51,17 @@ doSomething(model: Test.ViewModel(value: "1"))
 
 A plain search and replace would not work. Each `.init(...)` call can resolve to a different type, and that type is not written anywhere at the call site.
 
-But the compiler already knows the answer.
+But the type information already exists somewhere in the compiler tooling.
 
-If we could somehow ask the compiler for the resolved type, we could match that information back to the `.init(...)` call in the source file and rewrite the call explicitly.
+If we can extract the resolved type for each expression, we can match that information back to the `.init(...)` call in the source file and rewrite the call explicitly.
 
 ## A small benchmark
 
-Before spending more time on tooling, I wanted to benchmark different expression shapes to understand which ones get slower and which ones do not.
+Before building a rewrite tool, I wanted a smaller benchmark that could reproduce the same kind of type-checking behavior.
 
 I created a small benchmark repo, [swift-type-checking-benchmarks](https://github.com/kaanbiryol/swift-type-checking-benchmarks), where different expression shapes can be generated and measured. The benchmark creates repeated Swift files and runs `xcrun swiftc -typecheck` through [`hyperfine`](https://github.com/sharkdp/hyperfine).
 
-The goal was not to prove that `.init(...)` is always slow. It was to understand which expression shapes get slower and which ones do not.
-
-One useful example is a small overloaded analytics-style API:
+One example is a small overloaded analytics-style API:
 
 ```swift
 struct PurchaseEvent {
@@ -131,11 +129,15 @@ This does not mean explicit initializers are always `4.58x` faster. There are ca
 
 ## The solution
 
-At a high level, the tool has to do three things:
+Once the pattern was measurable, the next step was to build a tool that could automate the rewrite.
+
+This is where [SourceKit](https://github.com/swiftlang/swift/blob/main/tools/SourceKit) becomes useful. SourceKit can report expression type information when it receives the same compiler arguments that the project uses to build the file.
+
+At a high level, this tool does three things:
 
 1. Collect the compiler arguments the project uses.
-2. Pass those arguments and Swift files to SourceKit, then ask for expression type information.
-3. Rewrite `.init(...)` call sites with the resolved type using SwiftSyntax.
+2. Ask SourceKit for expression type information using those arguments.
+3. Use SwiftSyntax to rewrite only the `.init(...)` call sites that can be matched safely.
 
 ```mermaid
 flowchart LR
@@ -148,15 +150,11 @@ flowchart LR
     A --> B --> C --> D --> E
 ```
 
-[SourceKit](https://github.com/swiftlang/swift/blob/main/tools/SourceKit/docs/Protocol.md) is the service behind many Swift editor features. Tools can use it to ask questions like “what is the type of this expression?”, “where is this symbol defined?”, or “what completions are available here?”.
-
-That makes it useful for this kind of refactoring.
-
 ### 1. Grabbing compiler arguments
 
-SourceKit needs the same compiler context as the project, otherwise it won't be able to infer the implicit expressions.
+SourceKit needs the same compiler context as the project. Otherwise, it may not be able to resolve the expression types correctly.
 
-That means the right SDK, architecture, build configuration, search paths, module maps, package products, generated sources, and target-specific settings. Without that context, SourceKit may not be able to resolve the expression type.
+That means the right SDK, architecture, build configuration, search paths, module maps, package products, generated sources, and target-specific settings.
 
 In an Xcode project, the most practical source of those arguments was the indexing build settings:
 
@@ -170,31 +168,45 @@ xcodebuild \
   -json
 ```
 
-From that JSON, the tool reads `swiftASTCommandArguments` for each file and passes them to SourceKit as `key.compilerargs`.
+From that JSON, the tool reads `swiftASTCommandArguments` for each file and passes them to the SourceKit request.
 
-### 2. Asking SourceKit for expression types
+### 2. SourceKit requests
 
-SourceKit has an [expression type request](https://github.com/swiftlang/swift/blob/main/tools/SourceKit/docs/Protocol.md#expression-type). You give it the source file path, the compiler arguments for that file, and the request kind.
+SourceKit is request-based. For this tool, the important request is the [Expression Type request](https://github.com/swiftlang/swift/blob/main/tools/SourceKit/docs/Protocol.md#expression-type), which returns type information for expressions in a Swift file.
 
-The response includes expression offsets, lengths, and resolved types.
-
-For example, for this source:
+For a Swift file containing a call like this:
 
 ```swift
-...
 doSomething(model: .init(value: "1"))
-...
 ```
 
-A simplified response looks like this:
+a simplified expression-type request looks like this:
 
 ```yaml
-<key.expression_offset>: 128
-<key.expression_length>: 24
-<key.expression_type>: Test.ViewModel
+key.request: source.request.expression.type
+key.sourcefile: '/path/File.swift'
+key.compilerargs: # Compiler arguments collected in the previous step
+  - '-sdk'
+  - '/path/to/sdk'
+  - '/path/File.swift'
+key.fully_qualified: true
 ```
 
-This is great, because it doesn't only tell us the resolved type; it also tells us where that type information applies in the source file.
+The response can include the resolved expression type, together with the source range it applies to:
+
+```json
+{
+  "key.expression_type_list": [
+    {
+      "key.expression_offset": 19,
+      "key.expression_length": 17,
+      "key.expression_type": "Test.ViewModel"
+    }
+  ]
+}
+```
+
+That is the key piece of information the tool needs. At offset `19`, the inferred `.init(...)` call resolves to `Test.ViewModel`, so the tool can replace it with an explicit initializer call.
 
 ### 3. Rewriting with SwiftSyntax
 
@@ -212,7 +224,9 @@ doSomething(model: .init(value: "1"))
 doSomething(model: Test.ViewModel(value: "1"))
 ```
 
-That split is what makes the approach safe enough to run over a larger codebase. SourceKit provides compiler-derived type information. SwiftSyntax makes sure the edit lands on the right Swift syntax instead of treating the file as plain text.
+That split is what makes the approach safe enough to run over a larger codebase.
+
+SourceKit provides compiler-derived type information. SwiftSyntax makes sure the edit lands on the right Swift syntax instead of treating the file as plain text.
 
 If the tool cannot confidently match a SourceKit result to a `.init(...)` syntax node, it skips that call site instead of guessing.
 
@@ -248,7 +262,7 @@ Arrays have a similar problem. In array literals, SourceKit can return something
 Array<Test.ViewModel>.ArrayLiteralElement
 ```
 
-Again, that means something to the compiler, but it is not a type name you would write at the call site. Therefore, we need to detect this array-literal form and turn it back into `Test.ViewModel`.
+Again, that means something to the compiler, but it is not a type name you would write at the call site. The tool detects this array-literal form and turns it back into `Test.ViewModel`.
 
 For example, the sample project in [`init-revise-cli`](https://github.com/kaanbiryol/init-revise-cli) has cases like this:
 
@@ -274,23 +288,22 @@ I am sure there are more edge cases. Optionals and arrays were just the first on
 
 ## Not just initializers
 
-I focused on `.init(...)` in this post because that was the repeated pattern in front of me. The underlying problem is not specific to initializers.
+I focused on `.init(...)` in this post because that was the repeated pattern in front of me. But the underlying problem is not specific to initializers.
 
 Any expression that leaves the compiler with too much ambiguity can create similar work.
 
-The same approach still applies to those cases:
+The same approach still applies:
 
 1. Measure slow expression shapes.
 2. Find the repeated pattern.
 3. Use SourceKit to grab explicit type information.
-4. Replace.
-5. Profit at scale.
+4. Replace with explicit types.
 
 ## The example project
 
-The [init-revise-cli repo](https://github.com/kaanbiryol/init-revise-cli) includes an [`Example/`](https://github.com/kaanbiryol/init-revise-cli/tree/main/Example) project, that you can see how everything comes together.
+The [init-revise-cli repo](https://github.com/kaanbiryol/init-revise-cli) includes a small [`Example/`](https://github.com/kaanbiryol/init-revise-cli/tree/main/Example) project that shows how everything comes together.
 
-The public version is intentionally small. It shows the idea without trying to cover every shape from a production codebase.
+The public version is intentionally small. It demonstrates the SourceKit + SwiftSyntax flow without trying to cover every shape from a production codebase.
 
 ## Was it worth it?
 
@@ -300,7 +313,7 @@ That is not enough to make this a universal recommendation. But for a repeated s
 
 ## Tips
 
-Before rewriting anything, measure where the compiler is spending time. The slow type-checking flags are still practical tools for this; they are not just old compiler trivia.
+Before rewriting anything, measure where the compiler is spending time. The slow type-checking flags are still practical tools for this.
 
 Swift compiler has [frontend flags](https://github.com/swiftlang/swift/blob/main/include/swift/Option/FrontendOptions.td) for slow type-checking diagnostics:
 

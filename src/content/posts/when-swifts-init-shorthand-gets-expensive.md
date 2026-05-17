@@ -128,7 +128,9 @@ This does not mean explicit initializers are always `3.82x` faster. There are ca
 
 Once the pattern was measurable, the next step was to build a tool that could automate the rewrite.
 
-This is where [SourceKit](https://github.com/swiftlang/swift/blob/main/tools/SourceKit) becomes useful. SourceKit can report expression type information when it receives the same compiler arguments that the project uses to build the file.
+This is where [SourceKit](https://github.com/swiftlang/swift/blob/main/tools/SourceKit) becomes useful.
+
+SourceKit is the service behind many Swift editor features, such as code completion, diagnostics, and type information. It can answer structured requests about a Swift source file when given the file path and the compiler arguments needed to type-check it.
 
 At a high level, this tool does three things:
 

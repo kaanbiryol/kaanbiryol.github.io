@@ -61,34 +61,31 @@ Before building a rewrite tool, I wanted a smaller benchmark that could reproduc
 
 I created a small benchmark repo, [swift-type-checking-benchmarks](https://github.com/kaanbiryol/swift-type-checking-benchmarks), where different expression shapes can be generated and measured. The benchmark creates repeated Swift files and runs `xcrun swiftc -typecheck` through [`hyperfine`](https://github.com/sharkdp/hyperfine).
 
-One example is a small overloaded analytics-style API:
+One example is a small overloaded API:
 
 ```swift
-struct PurchaseEvent {
-    let id: Int
-    let name: String
+struct IntBox {
+    let value: Int
 }
 
-struct ScreenEvent {
-    let id: Int
-    let name: String
+struct ShortBox {
+    let value: Int
 }
 
-struct ErrorEvent {
-    let id: Int
-    let name: String
+struct DecimalBox {
+    let value: Int
 }
 
-func score(_ event: PurchaseEvent) -> Int {
-    event.id
+func read(_ box: IntBox) -> Int {
+    box.value
 }
 
-func score(_ event: ScreenEvent) -> Int16 {
-    Int16(event.id)
+func read(_ box: ShortBox) -> Int16 {
+    Int16(box.value)
 }
 
-func score(_ event: ErrorEvent) -> Double {
-    Double(event.id)
+func read(_ box: DecimalBox) -> Double {
+    Double(box.value)
 }
 ```
 
@@ -96,8 +93,8 @@ Then compare this:
 
 ```swift
 let total =
-    score(.init(id: 1, name: "checkout"))
-    + score(.init(id: 2, name: "pay"))
+    read(.init(value: 1))
+    + read(.init(value: 2))
     + 1
 ```
 
@@ -105,27 +102,27 @@ With this:
 
 ```swift
 let total =
-    score(PurchaseEvent(id: 1, name: "checkout"))
-    + score(PurchaseEvent(id: 2, name: "pay"))
+    read(IntBox(value: 1))
+    + read(IntBox(value: 2))
     + 1
 ```
 
-Both snippets compile. The difference is how much work the compiler has to do.
+Both snippets compile. The important detail is that `total` has no explicit type annotation, so the compiler has to infer the initializer target type and the expression result together.
 
-In the `.init(...)` version, each initializer starts without a concrete target type. The compiler has to resolve the overloaded `score` calls and the surrounding `+` expression together before it can settle on `PurchaseEvent`.
+In the `.init(...)` version, each initializer starts without a concrete target type. The compiler has to resolve the overloaded `read` calls and the surrounding `+` expression together before it can settle on `IntBox`.
 
-In the explicit version, `PurchaseEvent(...)` gives the solver the argument type immediately. That lets it discard the `ScreenEvent` and `ErrorEvent` overloads much earlier.
+In the explicit version, `IntBox(...)` gives the solver the argument type immediately. That lets it discard the `ShortBox` and `DecimalBox` overloads much earlier.
 
 In one local run with 300 repeated calls on Swift 6.3, the explicit version was faster:
 
 ```text
-explicit PurchaseEvent(...): 320.7 ms
-shorthand .init(...):        1.468 s
+explicit IntBox(...): 321.5 ms
+shorthand .init(...): 1.227 s
 ```
 
-That is about `4.58x` faster in that run. The benchmark is intentionally small, but it captures the shape of the issue.
+That is about `3.82x` faster in that run. The benchmark is intentionally small, but it captures the shape of the issue.
 
-This does not mean explicit initializers are always `4.58x` faster. There are cases where `.init(...)` is harmless, or even faster. The useful takeaway is to measure your own expression shapes.
+This does not mean explicit initializers are always `3.82x` faster. There are cases where `.init(...)` is harmless, or even faster. The useful takeaway is to measure your own expression shapes.
 
 ## The solution
 

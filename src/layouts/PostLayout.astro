@@ -23,7 +23,8 @@ const { title, pubDate, readingTime, toc } = Astro.props as PostLayoutProps
 const plainTitle = stripInlineMarkdown(title)
 
 const postSlug = Astro.url.pathname.split('/').filter(Boolean).pop() || ''
-const ogImage = `/open-graph/${postSlug}.png?v=20260517`
+const ogImageVersion = pubDate.toISOString().slice(0, 10).replaceAll('-', '')
+const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
 ---
 
 <BaseLayout title={`${plainTitle} · ${themeConfig.site.title}`} description={themeConfig.site.description} type="post">

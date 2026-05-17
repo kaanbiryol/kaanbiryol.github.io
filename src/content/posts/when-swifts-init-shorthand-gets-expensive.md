@@ -1,7 +1,7 @@
 ---
 title: 'When Swift’s `.init` Shorthand Gets Expensive'
 description: 'A practical refactoring story about Swift type inference, slow .init shorthand, SourceKit expression types, and SwiftSyntax rewrites.'
-pubDate: 2026-05-14
+pubDate: 2026-05-17
 ---
 
 ## Introduction

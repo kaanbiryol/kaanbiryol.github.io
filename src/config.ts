@@ -6,7 +6,7 @@ const previewPost = process.env.PREVIEW_POST?.trim().replace(/\.md$/, '') || und
 export const themeConfig: ThemeConfig = {
   // SITE INFO ///////////////////////////////////////////////////////////////////////////////////////////
   site: {
-    website: 'https://kaanbiryol.github.io/', // Site domain
+    website: 'https://kaanbiryol.com/', // Site domain
     title: 'Kaan Biryol', // Site title
     author: 'Kaan Biryol', // Author name
     description: 'Mobile Platform Engineer building faster, more reliable infrastructure for iOS teams', // Site description

@@ -1,6 +1,7 @@
 import { getCollection, type CollectionEntry } from 'astro:content'
 import { OGImageRoute } from 'astro-og-canvas'
 import { publicationConfig, themeConfig } from '../../config'
+import { stripInlineMarkdown } from '../../utils/inline-markdown'
 
 export const prerender = true
 
@@ -23,26 +24,22 @@ export const { getStaticPaths, GET } = await OGImageRoute({
   param: 'route',
   pages,
   getImageOptions: (_path: string, page: CollectionEntry<'posts'>['data']) => ({
-    title: page.title,
+    title: stripInlineMarkdown(page.title),
     description: themeConfig.site.title,
     logo: {
       path: 'public/og/og-logo.png',
       size: [80, 80]
     },
-    bgGradient: [[255, 255, 255]],
-    bgImage: {
-      path: 'public/og/og-bg.png',
-      fit: 'fill'
-    },
+    bgGradient: [[28, 28, 28]],
     padding: 64,
     font: {
       title: {
-        color: [28, 28, 28],
+        color: [232, 229, 220],
         size: 64,
         weight: 'SemiBold'
       },
       description: {
-        color: [160, 160, 160],
+        color: [168, 164, 153],
         size: 36,
         weight: 'Normal'
       }

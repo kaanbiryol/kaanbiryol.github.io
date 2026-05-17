@@ -17,6 +17,12 @@ const links = [
     href: 'https://linkedin.com/in/kaan-biryol',
     external: true,
     icon: 'linkedin'
+  },
+  {
+    label: 'RSS',
+    href: '/rss.xml',
+    external: false,
+    icon: 'rss'
   }
 ]
 ---
@@ -53,6 +59,14 @@ const links = [
               <path
                 fill="currentColor"
                 d="M18.9 1.15h3.68l-8.04 9.19L24 22.85h-7.41l-5.8-7.58-6.64 7.58H.47l8.6-9.83L0 1.15h7.59l5.24 6.93 6.07-6.93Zm-1.29 19.5h2.04L6.48 3.23H4.29l13.32 17.42Z"
+              />
+            </svg>
+          )}
+          {link.icon === 'rss' && (
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                fill="currentColor"
+                d="M5.1 16.75a2.15 2.15 0 1 1 0 4.3 2.15 2.15 0 0 1 0-4.3ZM3 9.6c6.3 0 11.4 5.1 11.4 11.4h-3.05A8.35 8.35 0 0 0 3 12.65V9.6ZM3 3c9.94 0 18 8.06 18 18h-3.05A14.95 14.95 0 0 0 3 6.05V3Z"
               />
             </svg>
           )}

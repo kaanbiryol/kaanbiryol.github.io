@@ -1,0 +1,144 @@
+---
+interface Props {
+  title: string
+  url: string
+}
+
+const { title, url } = Astro.props
+
+const xShareUrl = new URL('https://twitter.com/intent/tweet')
+xShareUrl.searchParams.set('text', title)
+xShareUrl.searchParams.set('url', url)
+---
+
+<nav class="post-share" aria-label="Share article" data-post-share data-share-title={title} data-share-url={url}>
+  <button class="post-share__action" type="button" data-share-native hidden>share</button>
+  <a
+    class="post-share__action post-share__action--icon"
+    href={xShareUrl.toString()}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={`Share "${title}" on X`}
+    title="Share on X"
+  >
+    <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+      <path
+        fill="currentColor"
+        d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.68l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z"
+      ></path>
+    </svg>
+  </a>
+</nav>
+
+<script>
+  const initPostShare = () => {
+    document.querySelectorAll('[data-post-share]').forEach((root) => {
+      if (!(root instanceof HTMLElement) || root.dataset.shareReady === 'true') return
+
+      root.dataset.shareReady = 'true'
+
+      const title = root.dataset.shareTitle || document.title
+      const url = root.dataset.shareUrl || window.location.href
+      const nativeShareButton = root.querySelector('[data-share-native]')
+
+      if (nativeShareButton instanceof HTMLButtonElement) {
+        const canNativeShare = typeof navigator.share === 'function'
+        nativeShareButton.hidden = !canNativeShare
+
+        if (canNativeShare) {
+          nativeShareButton.addEventListener('click', async () => {
+            try {
+              await navigator.share({ title, url })
+            } catch (error) {
+              if (!(error instanceof DOMException) || error.name !== 'AbortError') {
+                console.error('Failed to share article:', error)
+              }
+            }
+          })
+        }
+      }
+    })
+  }
+
+  document.addEventListener('astro:page-load', initPostShare)
+  initPostShare()
+</script>
+
+<style>
+  .post-share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.45rem;
+    margin-top: 0.875rem;
+  }
+
+  .post-share .post-share__action {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.9rem;
+    padding: 0 0.65rem;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--sans);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-light);
+    line-height: 1;
+    letter-spacing: 0;
+    text-decoration: none;
+    transition:
+      background-color 0.15s ease-out,
+      border-color 0.15s ease-out,
+      color 0.15s ease-out;
+  }
+
+  .post-share .post-share__action:hover,
+  .post-share .post-share__action:focus-visible {
+    border-color: var(--text-tertiary);
+    background: var(--code-bg);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+
+  .post-share .post-share__action[hidden] {
+    display: none;
+  }
+
+  .post-share .post-share__action[data-share-native] {
+    min-width: 3.65rem;
+  }
+
+  .post-share .post-share__action--icon {
+    width: 1.9rem;
+    min-width: 1.9rem;
+    padding: 0;
+  }
+
+  .post-share .post-share__action--icon svg {
+    width: 0.78rem;
+    height: 0.78rem;
+  }
+
+  @media (max-width: 768px) {
+    .post-share {
+      gap: 0.4rem;
+      margin-top: 0.8rem;
+    }
+
+    .post-share .post-share__action {
+      min-height: 2.05rem;
+      padding: 0 0.7rem;
+    }
+
+    .post-share .post-share__action--icon {
+      width: 2.05rem;
+      min-width: 2.05rem;
+      padding: 0;
+    }
+  }
+</style>

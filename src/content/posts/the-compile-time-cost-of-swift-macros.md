@@ -3,8 +3,6 @@ title: 'The Compile-Time Cost of Swift Macros'
 pubDate: 2026-05-31
 ---
 
-# The Compile-Time Cost of Swift Macros
-
 ## Introduction
 
 Swift macros are attractive because the call site looks clean. You can achieve much more by writing as little as possible. You add an attribute, delete a few lines of boilerplate, and move on.
@@ -54,7 +52,7 @@ This post focuses on the third cost.
 
 This is not a perfect "macro expansion only" measurement. Swift has lower-level compiler statistics, such as [`-stats-output-dir`](https://github.com/swiftlang/swift/blob/main/docs/CompilerPerformance.md#unified-stats-reporter), that can expose some macro-related compiler work. But those numbers are compiler-internal details, not a stable high-level metric that says "this many milliseconds were spent expanding macros."
 
-For this benchmark, I used `swiftc -typecheck` wall-clock time as a practical approximation. It stays in the frontend and avoids optimization, code generation, object-file emission, and linking. It still measures more than macro expansion — parsing, type checking, imports, diagnostics, and type-checking the expanded code are all included — but that is also the cost you usually feel while developing.
+For this benchmark, I used `swiftc -typecheck` wall-clock time as a practical approximation. It stays in the frontend and avoids optimization, code generation, object-file emission, and linking. It still measures more than macro expansion, parsing, type checking, imports, diagnostics, and type-checking the expanded code are all included, but that is also the cost you usually feel while developing.
 
 > If you want to dig deeper, you can pass `-stats-output-dir /tmp/stats` to your `swiftc` invocation to collect compiler statistics and inspect the generated JSON files.
 

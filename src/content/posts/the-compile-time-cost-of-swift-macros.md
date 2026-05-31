@@ -278,3 +278,11 @@ Macros are not just syntax sugar. They are compiler plugins, and their cost is p
 Once a macro is used hundreds or thousands of times, it can start to affect your compile times in a way that is no longer invisible. And as the benchmark shows, the cost is not only about how many macro calls you have, but also where they are.
 
 So my rule of thumb is simple: use macros when they bring real value, but measure before turning them into a convention. The benefit should be worth the extra cost.
+
+## References
+
+- [swift-macro-benchmark](https://github.com/kaanbiryol/swift-macro-benchmark)
+- [Swift compiler performance: Unified Stats Reporter](https://github.com/swiftlang/swift/blob/main/docs/CompilerPerformance.md#unified-stats-reporter)
+- [Swift Forums: Preview swift-syntax prebuilts for macros](https://forums.swift.org/t/preview-swift-syntax-prebuilts-for-macros/80202)
+- [Swift Evolution: SE-0382 Expression Macros](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0382-expression-macros.md)
+- [Swift Evolution: SE-0389 Attached Macros](https://github.com/swiftlang/swift-evolution/blob/main/proposals/0389-attached-macros.md)

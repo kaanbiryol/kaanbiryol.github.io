@@ -218,14 +218,20 @@
 
 /* Blockquotes */
 .prose blockquote {
-  border-left: 2px solid var(--border);
-  margin: 0 0 1.75em 0.125em;
-  padding: 0 0 0 1.375em;
+  border-left: 3px solid var(--border);
+  border-radius: 0 4px 4px 0;
+  background: color-mix(in srgb, var(--code-bg) 70%, transparent);
+  margin: 1.5em 0 1.75em;
+  padding: 0.875em 1em 0.875em 1.375em;
   text-align: left;
 }
 
 .prose blockquote p {
   margin: 0;
+}
+
+.prose blockquote code {
+  overflow-wrap: anywhere;
 }
 
 .prose blockquote cite {

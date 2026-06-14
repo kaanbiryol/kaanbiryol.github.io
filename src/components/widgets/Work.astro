@@ -1,0 +1,358 @@
+---
+type WorkVariant = 'compact' | 'full'
+
+const { variant = 'compact' } = Astro.props as { variant?: WorkVariant }
+const isFull = variant === 'full'
+const headingId = isFull ? 'open-source-heading' : 'selected-work-heading'
+
+const iosApps = [
+  {
+    name: 'SIXT',
+    href: 'https://apps.apple.com/us/app/sixt-rent-share-ride-plus/id295079411?uo=4',
+    meta: 'Mobility'
+  },
+  {
+    name: 'Akbank Mobile',
+    href: 'https://apps.apple.com/tr/app/akbank-mobile/id560516360?uo=4',
+    meta: 'Finance'
+  },
+  {
+    name: 'VakifBank Mobile Banking',
+    href: 'https://apps.apple.com/tr/app/vak%C4%B1fbank-mobil-bankac%C4%B1l%C4%B1k/id853569450?uo=4',
+    meta: 'Finance'
+  },
+  {
+    name: 'AgeSA Mobil',
+    href: 'https://apps.apple.com/tr/app/agesa-mobil/id1438635685?uo=4',
+    meta: 'Finance'
+  },
+  {
+    name: 'Tosla',
+    href: 'https://apps.apple.com/tr/app/tosla/id1463160775?uo=4',
+    meta: 'Finance'
+  },
+  {
+    name: 'Halkbank Mobil',
+    href: 'https://apps.apple.com/tr/app/halkbank-mobil/id1068841746?uo=4',
+    meta: 'Finance'
+  }
+]
+
+const tools = [
+  {
+    name: 'obsidian-crate',
+    href: 'https://github.com/kaanbiryol/obsidian-crate',
+    description:
+      'Self-hosted Obsidian vault sync and reminders using Cloudflare R2, Workers, D1, and push notifications.',
+    language: 'TypeScript',
+    languageColor: '#3178c6',
+    pushedAt: '2026-06-14T11:10:45Z'
+  },
+  {
+    name: 'harbor',
+    href: 'https://github.com/kaanbiryol/harbor',
+    description:
+      'Native Rust app for GitHub pull request workflows, review threads, checks, logs, and local worktrees.',
+    language: 'Rust',
+    languageColor: '#dea584',
+    pushedAt: '2026-06-13T20:22:22Z'
+  },
+  {
+    name: 'swift_unused_deps',
+    href: 'https://github.com/kaanbiryol/swift_unused_deps',
+    description: 'Detect unused and missing direct Bazel dependencies for Swift targets.',
+    language: 'Swift',
+    languageColor: '#f05138',
+    pushedAt: '2026-06-01T19:32:57Z'
+  },
+  {
+    name: 'init-revise-cli',
+    href: 'https://github.com/kaanbiryol/init-revise-cli',
+    description: 'Swift CLI that rewrites type-inferred initializations to explicit ones using SwiftSyntax.',
+    language: 'Swift',
+    languageColor: '#f05138',
+    pushedAt: '2026-05-15T17:04:56Z'
+  },
+  {
+    name: 'tuist-to-bazel',
+    href: 'https://github.com/kaanbiryol/tuist-to-bazel',
+    description: 'Generate Bazel BUILD files from a Tuist project graph.',
+    language: 'Ruby',
+    languageColor: '#701516',
+    pushedAt: '2026-03-29T09:43:53Z'
+  }
+]
+
+const visibleTools = isFull ? tools : tools.slice(0, 3)
+---
+
+<section class:list={['work-section', isFull ? 'work-page' : 'work-summary']} aria-labelledby={headingId}>
+  {
+    !isFull && (
+      <div class="section-header">
+        <h2 id={headingId}>Latest Work</h2>
+        <a href="/work/">All work</a>
+      </div>
+    )
+  }
+
+  {
+    isFull && (
+      <h1 id={headingId} class="subheading">
+        Open-source
+      </h1>
+    )
+  }
+  {isFull && <p class="section-note">Selected projects and tools I maintain.</p>}
+  <ul class="project-list">
+    {
+      visibleTools.map((project) => (
+        <li>
+          <article class="project-item">
+            <div class="project-header">
+              <h3>
+                <a href={project.href} target="_blank" rel="noopener noreferrer">
+                  {project.name}
+                </a>
+              </h3>
+            </div>
+            <p class="description">{project.description}</p>
+            <p class="project-meta">
+              <span class="language">
+                <span class="language-dot" style={`--language-color: ${project.languageColor}`} />
+                {project.language}
+              </span>
+            </p>
+          </article>
+        </li>
+      ))
+    }
+  </ul>
+
+  {
+    isFull && (
+      <section class="detail-section" aria-labelledby="app-work-heading">
+        <div class="section-header secondary">
+          <h2 id="app-work-heading">iOS Applications</h2>
+        </div>
+
+        <p class="section-note">
+          I worked on these iOS apps professionally across mobility, banking, insurance, and payments.
+        </p>
+        <ul class="app-link-list" aria-label="Professional iOS app work">
+          {iosApps.map((project) => (
+            <li>
+              <a
+                class="app-name"
+                href={project.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`${project.name}, ${project.meta}`}
+              >
+                {project.name}
+              </a>
+              <span class="app-type">{project.meta}</span>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</section>
+
+<style>
+  .work-section {
+    margin-top: 2.75rem;
+  }
+
+  .work-page {
+    margin-top: 1.25rem;
+  }
+
+  .section-header {
+    align-items: baseline;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+    margin-bottom: 0.875rem;
+  }
+
+  .section-header.secondary {
+    margin-bottom: 0;
+  }
+
+  h1,
+  h2 {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .subheading {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .section-header a {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    text-decoration: underline;
+    text-decoration-color: var(--text-tertiary);
+    transition:
+      color 0.2s ease-out,
+      text-decoration-color 0.2s ease-out;
+    white-space: nowrap;
+  }
+
+  .section-header a:hover {
+    color: var(--text-primary);
+    text-decoration-color: var(--text-primary);
+  }
+
+  .section-note {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.6;
+    margin: 0.25rem 0 0.75rem;
+  }
+
+  .project-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .project-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .project-list > li {
+    border-top: 1px solid var(--border);
+  }
+
+  .project-list > li:first-child {
+    border-top: 0;
+  }
+
+  .project-list > li:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .project-item {
+    padding: 0.95rem 0;
+  }
+
+  .project-header {
+    align-items: baseline;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+  }
+
+  h3 {
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  h3 a {
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: color 0.2s ease-out;
+  }
+
+  h3 a:hover {
+    color: var(--text-secondary);
+  }
+
+  .description {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.6;
+    margin: 0.25rem 0 0;
+  }
+
+  .project-meta {
+    align-items: center;
+    color: var(--text-tertiary);
+    display: flex;
+    flex-wrap: wrap;
+    font-size: var(--font-size-s);
+    gap: 0.55rem;
+    line-height: 1.5;
+    margin: 0.55rem 0 0;
+  }
+
+  .detail-section {
+    margin-top: 2.25rem;
+  }
+
+  .app-link-list {
+    align-items: baseline;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.85rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app-link-list > li {
+    align-items: baseline;
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+
+  .app-name {
+    color: var(--text-primary);
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    text-decoration: none;
+    transition: color 0.2s ease-out;
+  }
+
+  .app-name:hover {
+    color: var(--text-secondary);
+  }
+
+  .app-type {
+    color: var(--text-tertiary);
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+
+  .app-type::before {
+    content: '·';
+    margin-right: 0.35rem;
+  }
+
+  .language {
+    align-items: center;
+    display: inline-flex;
+    gap: 0.35rem;
+  }
+
+  .language-dot {
+    background-color: var(--language-color);
+    border-radius: 50%;
+    content: '';
+    display: inline-block;
+    height: 0.6rem;
+    width: 0.6rem;
+  }
+
+  @media (max-width: 620px) {
+    .work-page {
+      margin-top: 1rem;
+    }
+  }
+</style>

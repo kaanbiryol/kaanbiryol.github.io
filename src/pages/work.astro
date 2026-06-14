@@ -1,6 +1,12 @@
 ---
 import IndexLayout from '@/layouts/IndexLayout.astro'
+import Work from '@/components/widgets/Work.astro'
 import { themeConfig } from '@/config'
 ---
 
-<IndexLayout title={`Work · ${themeConfig.site.title}`} description={themeConfig.site.description} />
+<IndexLayout
+  title={`Work · ${themeConfig.site.title}`}
+  description="Selected open-source projects and iOS app work by Kaan Biryol"
+>
+  <Work variant="full" />
+</IndexLayout>

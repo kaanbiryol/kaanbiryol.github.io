@@ -3,6 +3,7 @@ import IndexLayout from '@/layouts/IndexLayout.astro'
 import About from '@/components/widgets/About.astro'
 import ContactLinks from '@/components/widgets/ContactLinks.astro'
 import PostList from '@/components/widgets/PostList.astro'
+import Work from '@/components/widgets/Work.astro'
 import { themeConfig } from '@/config'
 import { getSortedFilteredPosts } from '@/utils/draft'
 
@@ -23,6 +24,7 @@ const latestPosts = (await getSortedFilteredPosts()).slice(0, 5)
       </section>
     )
   }
+  <Work />
 </IndexLayout>
 
 <style>

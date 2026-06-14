@@ -43,5 +43,5 @@ export const publicationConfig = {
   publishPosts: true,
   previewPost,
   showWriting: true,
-  showWork: false
+  showWork: true
 }

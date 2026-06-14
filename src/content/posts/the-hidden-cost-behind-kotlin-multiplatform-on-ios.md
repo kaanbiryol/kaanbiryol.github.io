@@ -180,7 +180,7 @@ So I ran the same single-module internal-change benchmark with different module 
 |              200 |                 3.19s |               9.32s |     2.9x |
 |              400 |                 4.90s |              15.68s |     3.2x |
 
-I also ran the size sweep for the public API change and 3-module cascade scenarios. Those tables are in the benchmark repo's [size sweep results](https://github.com/kaanbiryol/kmp-ios-benchmark/blob/main/bench/results/size_sweep.md). The direction was the same: as modules get larger, the KMP path gets expensive faster than the Swift-only path. The slowdown factor is not constant. It grows with the shared module.
+I also ran the size sweep for the public API change and 3-module cascade scenarios. Those tables are in the benchmark repo's [size sweep results](https://github.com/kaanbiryol/kmp-ios-benchmark/tree/master/bench/results/sweep). The direction was the same: as modules get larger, the KMP path gets expensive faster than the Swift-only path. The slowdown factor is not constant. It grows with the shared module.
 
 The regression from the benchmark gives roughly:
 

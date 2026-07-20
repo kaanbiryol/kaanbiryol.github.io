@@ -57,7 +57,7 @@
     "remark-preset-lint-recommended": "^7.0.1",
     "tsx": "^4.23.0",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.63.0"
+    "typescript-eslint": "^8.64.0"
   },
   "pnpm": {
     "overrides": {

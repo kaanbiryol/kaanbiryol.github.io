@@ -1,5 +1,6 @@
 import { defineConfig } from 'astro/config'
 import sitemap from '@astrojs/sitemap'
+import { unified } from '@astrojs/markdown-remark'
 import remarkMath from 'remark-math'
 import remarkDirective from 'remark-directive'
 import rehypeKatex from 'rehype-katex'
@@ -23,6 +24,10 @@ export default defineConfig({
     }
   },
   markdown: {
+    processor: unified({
+      remarkPlugins: [remarkMath, remarkDirective, remarkDataCharts, remarkEmbeddedMedia, remarkReadingTime, remarkTOC],
+      rehypePlugins: [rehypeKatex, rehypeCleanup, rehypeImageProcessor, rehypeCopyCode]
+    }),
     shikiConfig: {
       themes: {
         light: 'github-light',
@@ -30,9 +35,7 @@ export default defineConfig({
       },
       defaultColor: false,
       wrap: false
-    },
-    remarkPlugins: [remarkMath, remarkDirective, remarkDataCharts, remarkEmbeddedMedia, remarkReadingTime, remarkTOC],
-    rehypePlugins: [rehypeKatex, rehypeCleanup, rehypeImageProcessor, rehypeCopyCode]
+    }
   },
   integrations: [sitemap()],
   vite: {

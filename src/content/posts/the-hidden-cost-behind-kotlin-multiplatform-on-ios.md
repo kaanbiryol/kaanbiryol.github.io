@@ -68,11 +68,13 @@ For the Swift-only path, the benchmark builds a Swift framework target and the i
 ## Clean builds
 
 :::chart{type="grouped-bar" title="Clean build time" unit="s" axis-label="Build time (seconds)" precision="2" exclude="Overhead"}
-| Scenario | Swift | KMP | Overhead |
+
+| Scenario                        |  Swift |    KMP | Overhead |
 | ------------------------------- | -----: | -----: | -------: |
-| Clean Debug | 9.18s | 13.96s | +52% |
-| Clean Release | 15.48s | 40.54s | +162% |
-| Clean Debug, cold Gradle daemon | 9.18s | 22.54s | +146% |
+| Clean Debug                     |  9.18s | 13.96s |     +52% |
+| Clean Release                   | 15.48s | 40.54s |    +162% |
+| Clean Debug, cold Gradle daemon |  9.18s | 22.54s |    +146% |
+
 :::
 
 The debug clean build was slower with KMP: 13.96s compared with 9.18s for Swift. That is not surprising as Gradle has to build the Kotlin framework before `xcodebuild` can build the app.
@@ -126,11 +128,13 @@ The benchmark also injects a fresh value into the toggled line for each run. Tha
 Here are the incremental results:
 
 :::chart{type="grouped-bar" title="Incremental feedback-loop time" unit="s" axis-label="Build time (seconds)" precision="2" exclude="Overhead"}
-| Scenario | Swift | KMP | Overhead |
+
+| Scenario               | Swift |    KMP | Overhead |
 | ---------------------- | ----: | -----: | -------: |
-| Single internal change | 3.19s | 10.36s | +225% |
-| Public API change | 3.27s | 9.40s | +187% |
-| 3-module cascade | 7.88s | 19.00s | +141% |
+| Single internal change | 3.19s | 10.36s |    +225% |
+| Public API change      | 3.27s |  9.40s |    +187% |
+| 3-module cascade       | 7.88s | 19.00s |    +141% |
+
 :::
 
 A single internal change in Swift rebuilt in 3.19s. The same kind of change in KMP took 10.36s.
@@ -142,10 +146,12 @@ But from the iOS side, the changed Kotlin code still has to become a new framewo
 Breaking down the KMP build makes that clearer:
 
 :::chart{type="stacked-bar" title="Where the incremental loop spends time" unit="s" axis-label="Build time (seconds)" precision="2"}
-| Pipeline | Framework build and link | App build | Other overhead |
-| -------- | -----------------------: | --------: | -------------: |
-| KMP | 8.13s | 2.05s | 0.18s |
-| Swift-only | 0.00s | 3.19s | 0.00s |
+
+| Pipeline   | Framework build and link | App build | Other overhead |
+| ---------- | -----------------------: | --------: | -------------: |
+| KMP        |                    8.13s |     2.05s |          0.18s |
+| Swift-only |                    0.00s |     3.19s |          0.00s |
+
 :::
 
 The expensive phase is the Gradle/Kotlin Native framework build.
@@ -179,11 +185,13 @@ The next question was whether this cost stays roughly fixed or gets worse as the
 So I ran the same single-module internal-change benchmark with different module sizes.
 
 :::chart{type="line" title="Incremental time as the shared module grows" unit="s" axis-label="Build time (seconds)" x-label="Files per module" precision="2" exclude="Slowdown"}
+
 | Files per module | Swift internal change | KMP internal change | Slowdown |
 | ---------------: | --------------------: | ------------------: | -------: |
-| 100 | 2.84s | 6.92s | 2.4x |
-| 200 | 3.19s | 9.32s | 2.9x |
-| 400 | 4.90s | 15.68s | 3.2x |
+|              100 |                 2.84s |               6.92s |     2.4x |
+|              200 |                 3.19s |               9.32s |     2.9x |
+|              400 |                 4.90s |              15.68s |     3.2x |
+
 :::
 
 I also ran the size sweep for the public API change and 3-module cascade scenarios. Those tables are in the benchmark repo's [size sweep results](https://github.com/kaanbiryol/kmp-ios-benchmark/tree/master/bench/results/sweep). The direction was the same: as modules get larger, the KMP path gets expensive faster than the Swift-only path. The slowdown factor is not constant. It grows with the shared module.

@@ -12,7 +12,7 @@ export function getRelatedPosts(
   return posts
     .filter((post) => post.id !== currentPost.id)
     .map((post) => {
-      const sharedTopics = post.data.topics.filter((topic) => currentTopics.has(normalizeTopic(topic)))
+      const sharedTopics = post.data.topics.filter((topic: string) => currentTopics.has(normalizeTopic(topic)))
 
       return {
         id: post.id,

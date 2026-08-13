@@ -35,5 +35,5 @@ export const getTopicsBySlug = (topics: Iterable<string>) => {
 
 export const postHasTopic = (post: CollectionEntry<'posts'>, topic: string) => {
   const normalizedTopic = normalizeTopic(topic)
-  return post.data.topics.some((postTopic) => normalizeTopic(postTopic) === normalizedTopic)
+  return post.data.topics.some((postTopic: string) => normalizeTopic(postTopic) === normalizedTopic)
 }

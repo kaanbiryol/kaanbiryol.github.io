@@ -17,6 +17,7 @@ export async function GET(context: APIContext) {
       title: post.data.title,
       description: post.data.description,
       pubDate: post.data.pubDate,
+      categories: post.data.topics,
       link: `/${post.id.replace(/\.md$/, '')}/`
     }))
   })

@@ -7,16 +7,23 @@ interface Props {
 }
 
 const { topics, label = 'Topics' } = Astro.props
+const currentPath = Astro.url.pathname
 ---
 
 {
   topics.length > 0 && (
     <ul class="topic-list" aria-label={label} data-topic-list>
-      {topics.map((topic) => (
-        <li>
-          <a href={getTopicHref(topic)}>{normalizeTopic(topic)}</a>
-        </li>
-      ))}
+      {topics.map((topic) => {
+        const href = getTopicHref(topic)
+
+        return (
+          <li>
+            <a href={href} aria-current={currentPath === href ? 'page' : undefined}>
+              {normalizeTopic(topic)}
+            </a>
+          </li>
+        )
+      })}
     </ul>
   )
 }
@@ -63,7 +70,8 @@ const { topics, label = 'Topics' } = Astro.props
   }
 
   .topic-list a:hover,
-  .topic-list a:focus-visible {
+  .topic-list a:focus-visible,
+  .topic-list a[aria-current='page'] {
     background: var(--code-bg);
     border-color: var(--text-tertiary);
     color: var(--text-primary);

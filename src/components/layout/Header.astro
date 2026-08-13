@@ -7,6 +7,11 @@ const navLinks = [
   ...(publicationConfig.showWriting ? [{ label: 'Writing', href: '/writing/' }] : [])
 ]
 const hasNavActions = navLinks.length > 0 || themeConfig.general.themeToggle
+const getAriaCurrent = (href: string): 'page' | 'location' | undefined => {
+  if (Astro.url.pathname === href) return 'page'
+  if (Astro.url.pathname.startsWith(href)) return 'location'
+  return undefined
+}
 ---
 
 <header>
@@ -18,7 +23,7 @@ const hasNavActions = navLinks.length > 0 || themeConfig.general.themeToggle
           {navLinks.length > 0 && (
             <div class="nav-links" aria-label="Main navigation">
               {navLinks.map((link) => (
-                <a href={link.href} aria-current={Astro.url.pathname === link.href ? 'page' : undefined}>
+                <a href={link.href} aria-current={getAriaCurrent(link.href)}>
                   {link.label}
                 </a>
               ))}

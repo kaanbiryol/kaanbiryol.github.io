@@ -4,15 +4,11 @@ import PostList from '@/components/widgets/PostList.astro'
 import { themeConfig } from '@/config'
 import IndexLayout from '@/layouts/IndexLayout.astro'
 import { getSortedFilteredPosts } from '@/utils/draft'
-import { getTopicSlug, normalizeTopic, postHasTopic } from '@/utils/topics'
+import { getTopicsBySlug, postHasTopic } from '@/utils/topics'
 
 export async function getStaticPaths() {
   const posts = await getSortedFilteredPosts()
-  const topics = new Map<string, string>()
-
-  posts.forEach((post) => {
-    post.data.topics.forEach((topic) => topics.set(getTopicSlug(topic), normalizeTopic(topic)))
-  })
+  const topics = getTopicsBySlug(posts.flatMap((post) => post.data.topics))
 
   return Array.from(topics, ([slug, topic]) => ({
     params: { topic: slug },

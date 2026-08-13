@@ -40,6 +40,7 @@ export interface BaseHeadProps {
     headline: string
     publishedTime: Date
     author: string
+    topics: string[]
   }
 }
 

@@ -31,7 +31,9 @@ const posts = defineCollection({
             .min(1)
             .transform((topic) => normalizeTopic(topic))
         )
-        .default([]),
+        .min(1, 'Add at least one topic')
+        .max(3, 'Use no more than three topics')
+        .refine((topics) => new Set(topics).size === topics.length, 'Topics must be unique'),
       image: z.string().optional()
     })
 })

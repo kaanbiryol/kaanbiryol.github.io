@@ -43,7 +43,6 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
       <div class="prose">
         <GradientMask />
         <BackButton href="/writing/" label="writing" />
-        {themeConfig.post.toc && <TableOfContents toc={toc} />}
         <div class="title">
           <h1 set:html={renderInlineMarkdown(title)} />
           <div class="date">
@@ -59,6 +58,7 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
           </div>
           <PostShare title={plainTitle} url={postUrl} />
         </div>
+        {themeConfig.post.toc && <TableOfContents toc={toc} />}
         <article class="content">
           <slot />
         </article>

@@ -5,22 +5,43 @@ import type { TOCProps } from '@/types'
 const { toc = [] }: TOCProps = Astro.props
 ---
 
-<div class="toc-container" id="toc">
-  <nav class="toc-nav" aria-label="On this page">
-    <ul class="toc-list" id="toc-list">
-      <!-- TOC items -->
-      {
-        toc.map((item) => (
-          <li class={`toc-item toc-level-${item.level}`}>
-            <a href={`#${item.id}`} class="toc-link" title={item.text}>
-              {item.text}
-            </a>
-          </li>
-        ))
-      }
-    </ul>
-  </nav>
-</div>
+{
+  toc.length > 0 && (
+    <>
+      <div class="toc-container" id="toc">
+        <nav class="toc-nav" aria-label="On this page">
+          <ul class="toc-list" id="toc-list">
+            {toc.map((item) => (
+              <li class={`toc-item toc-level-${item.level}`}>
+                <a href={`#${item.id}`} class="toc-link" title={item.text}>
+                  {item.text}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </div>
+
+      <details class="mobile-toc">
+        <summary>
+          <span>On this page</span>
+          <svg viewBox="0 0 16 16" aria-hidden="true">
+            <path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        </summary>
+        <nav aria-label="On this page">
+          <ul class="mobile-toc-list">
+            {toc.map((item) => (
+              <li class={`mobile-toc-item toc-level-${item.level}`}>
+                <a href={`#${item.id}`}>{item.text}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      </details>
+    </>
+  )
+}
 
 <script
   is:inline
@@ -271,9 +292,92 @@ const { toc = [] }: TOCProps = Astro.props
     padding-left: 1.5rem;
   }
 
+  .mobile-toc {
+    display: none;
+  }
+
   @media (max-width: 768px) {
     .toc-container {
       display: none !important;
+    }
+
+    .mobile-toc {
+      border: 1px solid var(--border);
+      border-radius: 0.5rem;
+      display: block;
+      margin: 1.25rem 0 1.75rem;
+      overflow: hidden;
+    }
+
+    .mobile-toc summary {
+      align-items: center;
+      color: var(--text-secondary);
+      cursor: pointer;
+      display: flex;
+      font-size: var(--font-size-s);
+      font-weight: var(--font-weight-bold);
+      justify-content: space-between;
+      line-height: 1.5;
+      list-style: none;
+      min-height: 2.75rem;
+      padding: 0 0.875rem;
+    }
+
+    .mobile-toc summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .mobile-toc summary:hover {
+      color: var(--text-primary);
+    }
+
+    .mobile-toc summary svg {
+      height: 1rem;
+      transition: transform 0.2s ease-out;
+      width: 1rem;
+    }
+
+    .mobile-toc[open] summary {
+      border-bottom: 1px solid var(--border);
+      color: var(--text-primary);
+    }
+
+    .mobile-toc[open] summary svg {
+      transform: rotate(180deg);
+    }
+
+    .prose .mobile-toc .mobile-toc-list {
+      list-style: none;
+      margin: 0;
+      padding: 0.625rem 0;
+    }
+
+    .prose .mobile-toc .mobile-toc-item {
+      margin: 0;
+      padding: 0;
+    }
+
+    .prose .mobile-toc .mobile-toc-item::before {
+      content: none;
+    }
+
+    .mobile-toc-item a {
+      color: var(--text-secondary);
+      display: block;
+      font-size: var(--font-size-s);
+      line-height: 1.5;
+      padding: 0.35rem 0.875rem;
+      text-decoration: none;
+    }
+
+    .mobile-toc-item a:hover,
+    .mobile-toc-item a:focus-visible {
+      background: var(--code-bg);
+      color: var(--text-primary);
+    }
+
+    .mobile-toc-item.toc-level-3 a {
+      padding-left: 1.625rem;
     }
   }
 </style>

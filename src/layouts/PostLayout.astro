@@ -15,6 +15,7 @@ import GitHubCard from '@/components/ui/GitHubCard.astro'
 import NeoDBCard from '@/components/ui/NeoDBCard.astro'
 import XPOST from '@/components/ui/XPOST.astro'
 import CopyCode from '@/components/ui/CopyCode.astro'
+import DataCharts from '@/components/ui/DataCharts.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { renderInlineMarkdown, stripInlineMarkdown } from '@/utils/inline-markdown'
 
@@ -65,6 +66,7 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
     <ImageOptimizer />
     <FootnoteScroll />
     <CopyCode />
+    <DataCharts />
     <GitHubCard />
     <XPOST />
     <NeoDBCard />
@@ -238,6 +240,41 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
       }, 1500)
     }
 
+    const revealDiagrams = () => {
+      const diagrams = document.querySelectorAll('.mermaid:not([data-diagram-motion])')
+      if (diagrams.length === 0) return
+
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      const observer = reducedMotion
+        ? null
+        : new IntersectionObserver(
+            (entries, currentObserver) => {
+              entries.forEach((entry) => {
+                if (!entry.isIntersecting) return
+                entry.target.classList.add('is-visible')
+                currentObserver.unobserve(entry.target)
+              })
+            },
+            { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+          )
+
+      diagrams.forEach((diagram) => {
+        diagram.dataset.diagramMotion = 'true'
+        diagram.querySelectorAll('.node').forEach((node, index) => {
+          node.style.setProperty('--diagram-delay', `${index * 75}ms`)
+        })
+        diagram.querySelectorAll('.edgePath path, path.flowchart-link').forEach((path, index) => {
+          const length = path.getTotalLength?.()
+          if (!length) return
+          path.style.setProperty('--diagram-path-length', String(length))
+          path.style.setProperty('--diagram-delay', `${120 + index * 65}ms`)
+        })
+
+        if (reducedMotion) diagram.classList.add('is-visible')
+        else observer.observe(diagram)
+      })
+    }
+
     const bindDiagramControls = () => {
       document.querySelectorAll('.mermaid').forEach((diagram) => {
         if (diagram.dataset.diagramControlsBound) return
@@ -295,6 +332,7 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
     const blocks = document.querySelectorAll('pre[data-language="mermaid"]')
     if (blocks.length === 0) {
       bindDiagramControls()
+      revealDiagrams()
       return
     }
     const { default: mermaid } = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs')
@@ -315,6 +353,7 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
     }
     await mermaid.run({ nodes: document.querySelectorAll('.mermaid') })
     bindDiagramControls()
+    revealDiagrams()
   })
 </script>
 

@@ -252,14 +252,13 @@ The hand-written baseline commands do not pass `-load-plugin-executable` or `-I 
 
 You can see all results in the [swift-macro-benchmark](https://github.com/kaanbiryol/swift-macro-benchmark) repository.
 
-| Benchmark                             |   Time |
-| ------------------------------------- | -----: |
-| Default, 1 file, 1 function           | 121 ms |
-| Macro, 1 file, 1 macro                | 154 ms |
-| Default, 1 file, 2000 functions       | 378 ms |
-| Macro, 1 file, 2000 macros            | 9.48 s |
-| Default, 100 files, 20 functions each | 5.18 s |
-| Macro, 100 files, 20 macros each      | 8.32 s |
+:::chart{type="grouped-bar" title="Frontend type-check time as usage scales" unit="s" axis-label="Type-check time (seconds)"}
+| Workload | Hand-written | Macro |
+| ------------------------- | -----------: | ----: |
+| One declaration | 0.121s | 0.154s |
+| 2,000 in one file | 0.378s | 9.48s |
+| 2,000 across 100 files | 5.18s | 8.32s |
+:::
 
 The single-macro case is mostly fixed overhead and noise. I would not draw a strong conclusion from a small difference in one local benchmark.
 

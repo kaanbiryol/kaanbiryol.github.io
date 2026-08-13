@@ -3,10 +3,10 @@ import { defineCollection } from 'astro:content'
 import { z } from 'astro/zod'
 import { publicationConfig } from './config'
 
-const postPattern = publicationConfig.publishPosts
-  ? '**/*.md'
-  : publicationConfig.previewPost
-    ? `${publicationConfig.previewPost}.md`
+const postPattern = publicationConfig.previewPost
+  ? `${publicationConfig.previewPost}.md`
+  : publicationConfig.publishPosts
+    ? ['**/*.md', '!**/_*.md']
     : '_*.md'
 
 const posts = defineCollection({

@@ -109,6 +109,18 @@ let total =
 
 Both snippets compile. The important detail is that `total` has no explicit type annotation, so the compiler has to infer the initializer target type and the expression result together.
 
+```mermaid
+flowchart TB
+    A["Shorthand path: .init(value:) starts without a target type"]
+    B["Keep IntBox, ShortBox, and DecimalBox overloads viable"]
+    C["Solve both calls and the surrounding + expression together"]
+    D["Explicit path: IntBox(value:) supplies the target type immediately"]
+    E["Discard the ShortBox and DecimalBox overloads early"]
+    F["Solve a smaller constraint graph"]
+
+    A --> B --> C -->|Compare with| D --> E --> F
+```
+
 In the `.init(...)` version, each initializer starts without a concrete target type. The compiler has to resolve the overloaded `read` calls and the surrounding `+` expression together before it can settle on `IntBox`.
 
 In the explicit version, `IntBox(...)` gives the solver the argument type immediately. That lets it discard the `ShortBox` and `DecimalBox` overloads much earlier.
@@ -139,7 +151,7 @@ At a high level, this tool does three things:
 3. Use SwiftSyntax to rewrite only the `.init(...)` call sites that can be matched safely.
 
 ```mermaid
-flowchart LR
+flowchart TB
     A["Collect Swift file and compiler arguments"]
     B["Ask SourceKit for inferred types of .init(...) calls"]
     C["SourceKit returns inferred type plus offset and length"]

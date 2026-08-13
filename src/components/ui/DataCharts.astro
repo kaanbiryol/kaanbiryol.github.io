@@ -1,0 +1,454 @@
+<script is:inline>
+  ;(() => {
+    if (window.__dataChartsScriptLoaded) return
+    window.__dataChartsScriptLoaded = true
+
+    const SVG_NAMESPACE = 'http://www.w3.org/2000/svg'
+    const chartRoots = new Set()
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)')
+
+    const svgElement = (name, attributes = {}, text = '') => {
+      const element = document.createElementNS(SVG_NAMESPACE, name)
+
+      Object.entries(attributes).forEach(([key, value]) => {
+        if (value !== undefined) element.setAttribute(key, String(value))
+      })
+
+      if (text) element.textContent = text
+      return element
+    }
+
+    const seriesColor = (index) => `var(--chart-series-${(index % 4) + 1})`
+
+    const parseNumber = (value) => {
+      const normalized = value.replaceAll(',', '').match(/-?\d+(?:\.\d+)?/)
+      return normalized ? Number(normalized[0]) : Number.NaN
+    }
+
+    const readChart = (root) => {
+      const table = root.querySelector('.data-chart__source')
+      if (!table) return null
+
+      const allHeaders = [...table.querySelectorAll('thead th')].map((cell) => cell.textContent?.trim() || '')
+      const excludedHeaders = new Set(
+        (root.dataset.chartExclude || '')
+          .split(',')
+          .map((header) => header.trim())
+          .filter(Boolean)
+      )
+      const includedIndexes = allHeaders
+        .slice(1)
+        .map((header, index) => ({ header, index: index + 1 }))
+        .filter(({ header }) => !excludedHeaders.has(header))
+      const headers = [allHeaders[0], ...includedIndexes.map(({ header }) => header)]
+      const rows = [...table.querySelectorAll('tbody tr')].map((row) => {
+        const cells = [...row.querySelectorAll('th, td')].map((cell) => cell.textContent?.trim() || '')
+        return {
+          label: cells[0],
+          values: includedIndexes.map(({ index }) => parseNumber(cells[index]))
+        }
+      })
+
+      if (headers.length < 2 || rows.length === 0 || rows.some((row) => row.values.some(Number.isNaN))) return null
+
+      const precisionValue = Number(root.dataset.chartPrecision)
+
+      return {
+        headers,
+        rows,
+        series: headers.slice(1),
+        unit: root.dataset.chartUnit || '',
+        axisLabel: root.dataset.chartAxisLabel || '',
+        xLabel: root.dataset.chartXLabel || '',
+        precision: Number.isInteger(precisionValue) ? precisionValue : undefined
+      }
+    }
+
+    const formatNumber = (value, precision) => {
+      if (precision !== undefined) return value.toFixed(precision)
+      if (Number.isInteger(value)) return String(value)
+      return value
+        .toFixed(value < 10 ? 2 : 1)
+        .replace(/0+$/, '')
+        .replace(/\.$/, '')
+    }
+
+    const formatValue = (value, data) => `${formatNumber(value, data.precision)}${data.unit}`
+
+    const niceScale = (value, tickCount) => {
+      if (value <= 0) return { max: 1, step: 1 }
+      const roughStep = value / Math.max(1, tickCount)
+      const magnitude = 10 ** Math.floor(Math.log10(roughStep))
+      const normalized = roughStep / magnitude
+      const multiplier = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10
+      const step = multiplier * magnitude
+      return { max: Math.ceil(value / step) * step, step }
+    }
+
+    const createSvg = (canvas, width, height, label) => {
+      const svg = svgElement('svg', {
+        class: 'data-chart__svg',
+        viewBox: `0 0 ${width} ${height}`,
+        role: 'img',
+        'aria-label': label,
+        preserveAspectRatio: 'xMidYMid meet'
+      })
+      canvas.replaceChildren(svg)
+      return svg
+    }
+
+    const renderLegend = (root, series) => {
+      const legend = root.querySelector('.data-chart__legend')
+      if (!legend) return
+
+      legend.replaceChildren(
+        ...series.map((label, index) => {
+          const item = document.createElement('span')
+          item.className = 'data-chart__legend-item'
+
+          const swatch = document.createElement('span')
+          swatch.className = 'data-chart__legend-swatch'
+          swatch.style.background = seriesColor(index)
+
+          item.append(swatch, document.createTextNode(label))
+          return item
+        })
+      )
+    }
+
+    const drawHorizontalAxis = ({ svg, xStart, xEnd, y, gridTop, max, step, label, precision }) => {
+      const tickCount = Math.round(max / step)
+
+      for (let index = 0; index <= tickCount; index += 1) {
+        const value = index * step
+        const x = xStart + (value / max) * (xEnd - xStart)
+        svg.append(
+          svgElement('line', {
+            class: index === 0 ? 'data-chart__axis-line' : 'data-chart__grid-line',
+            x1: x,
+            x2: x,
+            y1: gridTop,
+            y2: y
+          }),
+          svgElement(
+            'text',
+            {
+              class: 'data-chart__tick',
+              x,
+              y: y + 17,
+              'text-anchor': index === 0 ? 'start' : index === tickCount ? 'end' : 'middle'
+            },
+            formatNumber(value, precision)
+          )
+        )
+      }
+
+      if (label) {
+        svg.append(
+          svgElement('text', { class: 'data-chart__axis-label', x: xEnd, y: y + 34, 'text-anchor': 'end' }, label)
+        )
+      }
+    }
+
+    const drawGroupedBars = (root, data, width) => {
+      const canvas = root.querySelector('.data-chart__canvas')
+      const seriesCount = data.series.length
+      const groupHeight = 27 + seriesCount * 27 + 18
+      const top = 10
+      const bottom = 46
+      const height = top + data.rows.length * groupHeight + bottom
+      const plotStart = Math.min(62, width * 0.2)
+      const plotEnd = width - 58
+      const values = data.rows.flatMap((row) => row.values)
+      const scale = niceScale(Math.max(...values), width < 420 ? 3 : 4)
+      const svg = createSvg(canvas, width, height, root.querySelector('.data-chart__title')?.textContent || '')
+
+      drawHorizontalAxis({
+        svg,
+        xStart: plotStart,
+        xEnd: plotEnd,
+        y: height - bottom + 1,
+        gridTop: top + 22,
+        max: scale.max,
+        step: scale.step,
+        label: data.axisLabel,
+        precision: scale.step < 1 ? 1 : 0
+      })
+
+      data.rows.forEach((row, rowIndex) => {
+        const groupY = top + rowIndex * groupHeight
+        svg.append(svgElement('text', { class: 'data-chart__category', x: 0, y: groupY + 12 }, row.label))
+
+        row.values.forEach((value, seriesIndex) => {
+          const y = groupY + 27 + seriesIndex * 27
+          const barWidth = Math.max(1.5, (value / scale.max) * (plotEnd - plotStart))
+          const barGroup = svgElement('g', { transform: `translate(${plotStart} ${y})` })
+          const bar = svgElement('rect', {
+            class: 'data-chart__bar',
+            width: barWidth,
+            height: 14,
+            rx: 2,
+            fill: seriesColor(seriesIndex)
+          })
+          bar.style.setProperty('--chart-delay', `${rowIndex * 90 + seriesIndex * 55}ms`)
+          const title = svgElement(
+            'title',
+            {},
+            `${row.label}, ${data.series[seriesIndex]}: ${formatValue(value, data)}`
+          )
+          barGroup.append(bar, title)
+
+          svg.append(
+            svgElement('text', { class: 'data-chart__series-label', x: 0, y: y + 11 }, data.series[seriesIndex]),
+            barGroup,
+            svgElement(
+              'text',
+              { class: 'data-chart__value', x: width, y: y + 11, 'text-anchor': 'end' },
+              formatValue(value, data)
+            )
+          )
+        })
+      })
+    }
+
+    const drawLineChart = (root, data, width) => {
+      const canvas = root.querySelector('.data-chart__canvas')
+      const height = Math.max(280, Math.round(width * 0.64))
+      const margin = { top: 28, right: 18, bottom: 52, left: 44 }
+      const plotWidth = width - margin.left - margin.right
+      const plotHeight = height - margin.top - margin.bottom
+      const xValues = data.rows.map((row) => parseNumber(row.label))
+      const allValues = data.rows.flatMap((row) => row.values)
+      const xMin = Math.min(...xValues)
+      const xMax = Math.max(...xValues)
+      const scale = niceScale(Math.max(...allValues), width < 420 ? 3 : 4)
+      const xFor = (value) => margin.left + ((value - xMin) / Math.max(1, xMax - xMin)) * plotWidth
+      const yFor = (value) => margin.top + plotHeight - (value / scale.max) * plotHeight
+      const svg = createSvg(canvas, width, height, root.querySelector('.data-chart__title')?.textContent || '')
+      const yTickCount = Math.round(scale.max / scale.step)
+
+      for (let index = 0; index <= yTickCount; index += 1) {
+        const value = index * scale.step
+        const y = yFor(value)
+        svg.append(
+          svgElement('line', {
+            class: index === 0 ? 'data-chart__axis-line' : 'data-chart__grid-line',
+            x1: margin.left,
+            x2: width - margin.right,
+            y1: y,
+            y2: y
+          }),
+          svgElement(
+            'text',
+            { class: 'data-chart__tick', x: margin.left - 8, y: y + 4, 'text-anchor': 'end' },
+            formatNumber(value, scale.step < 1 ? 1 : 0)
+          )
+        )
+      }
+
+      const xTickIndexes =
+        width < 420 && data.rows.length > 3 ? [0, data.rows.length - 1] : data.rows.map((_, index) => index)
+      xTickIndexes.forEach((rowIndex) => {
+        const x = xFor(xValues[rowIndex])
+        svg.append(
+          svgElement('line', {
+            class: 'data-chart__tick-mark',
+            x1: x,
+            x2: x,
+            y1: margin.top + plotHeight,
+            y2: margin.top + plotHeight + 5
+          }),
+          svgElement(
+            'text',
+            { class: 'data-chart__tick', x, y: margin.top + plotHeight + 20, 'text-anchor': 'middle' },
+            rowIndex === 0 ? data.rows[rowIndex].label : formatNumber(xValues[rowIndex], undefined)
+          )
+        )
+      })
+
+      if (data.axisLabel) {
+        svg.append(svgElement('text', { class: 'data-chart__axis-label', x: 0, y: 11 }, data.axisLabel))
+      }
+      if (data.xLabel) {
+        svg.append(
+          svgElement(
+            'text',
+            { class: 'data-chart__axis-label', x: width - margin.right, y: height - 3, 'text-anchor': 'end' },
+            data.xLabel
+          )
+        )
+      }
+
+      data.series.forEach((series, seriesIndex) => {
+        const points = data.rows.map((row, rowIndex) => ({
+          x: xFor(xValues[rowIndex]),
+          y: yFor(row.values[seriesIndex]),
+          value: row.values[seriesIndex],
+          label: row.label
+        }))
+        const pathData = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ')
+        const path = svgElement('path', {
+          class: 'data-chart__line',
+          d: pathData,
+          fill: 'none',
+          stroke: seriesColor(seriesIndex)
+        })
+        svg.append(path)
+
+        points.forEach((point, pointIndex) => {
+          const circle = svgElement('circle', {
+            class: 'data-chart__point',
+            cx: point.x,
+            cy: point.y,
+            r: 4,
+            fill: seriesColor(seriesIndex)
+          })
+          circle.style.setProperty('--chart-delay', `${seriesIndex * 100 + pointIndex * 90}ms`)
+          circle.append(svgElement('title', {}, `${point.label}, ${series}: ${formatValue(point.value, data)}`))
+          svg.append(circle)
+        })
+
+        path.style.setProperty('--chart-delay', `${seriesIndex * 120}ms`)
+      })
+    }
+
+    const drawStackedBars = (root, data, width) => {
+      const canvas = root.querySelector('.data-chart__canvas')
+      const rowHeight = 62
+      const top = 12
+      const bottom = 46
+      const height = top + data.rows.length * rowHeight + bottom
+      const plotEnd = width - 58
+      const totals = data.rows.map((row) => row.values.reduce((sum, value) => sum + value, 0))
+      const scale = niceScale(Math.max(...totals), width < 420 ? 3 : 4)
+      const svg = createSvg(canvas, width, height, root.querySelector('.data-chart__title')?.textContent || '')
+
+      drawHorizontalAxis({
+        svg,
+        xStart: 0,
+        xEnd: plotEnd,
+        y: height - bottom + 1,
+        gridTop: top + 20,
+        max: scale.max,
+        step: scale.step,
+        label: data.axisLabel,
+        precision: scale.step < 1 ? 1 : 0
+      })
+
+      data.rows.forEach((row, rowIndex) => {
+        const y = top + rowIndex * rowHeight
+        let cursor = 0
+        svg.append(svgElement('text', { class: 'data-chart__category', x: 0, y: y + 12 }, row.label))
+
+        row.values.forEach((value, seriesIndex) => {
+          if (value <= 0) return
+          const x = (cursor / scale.max) * plotEnd
+          const segmentWidth = (value / scale.max) * plotEnd
+          const group = svgElement('g', { transform: `translate(${x} ${y + 24})` })
+          const segment = svgElement('rect', {
+            class: 'data-chart__bar',
+            width: segmentWidth,
+            height: 18,
+            rx: 2,
+            fill: seriesColor(seriesIndex)
+          })
+          segment.style.setProperty('--chart-delay', `${rowIndex * 100 + seriesIndex * 70}ms`)
+          group.append(
+            segment,
+            svgElement('title', {}, `${row.label}, ${data.series[seriesIndex]}: ${formatValue(value, data)}`)
+          )
+          svg.append(group)
+
+          if (segmentWidth > 48) {
+            svg.append(
+              svgElement(
+                'text',
+                {
+                  class: 'data-chart__segment-value',
+                  x: x + segmentWidth / 2,
+                  y: y + 37,
+                  'text-anchor': 'middle'
+                },
+                formatValue(value, data)
+              )
+            )
+          }
+          cursor += value
+        })
+
+        svg.append(
+          svgElement(
+            'text',
+            { class: 'data-chart__value', x: width, y: y + 37, 'text-anchor': 'end' },
+            formatValue(totals[rowIndex], data)
+          )
+        )
+      })
+    }
+
+    const renderChart = (root) => {
+      const data = readChart(root)
+      const canvas = root.querySelector('.data-chart__canvas')
+      if (!data || !canvas) return
+
+      const width = Math.max(280, Math.round(canvas.getBoundingClientRect().width))
+      renderLegend(root, data.series)
+
+      switch (root.dataset.chartType) {
+        case 'line':
+          drawLineChart(root, data, width)
+          break
+        case 'stacked-bar':
+          drawStackedBars(root, data, width)
+          break
+        default:
+          drawGroupedBars(root, data, width)
+      }
+
+      root.dataset.chartReady = 'true'
+      if (reduceMotion.matches) root.classList.add('is-visible')
+    }
+
+    const revealObserver = reduceMotion.matches
+      ? null
+      : new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry) => {
+              if (!entry.isIntersecting) return
+              entry.target.classList.add('is-visible')
+              observer.unobserve(entry.target)
+            })
+          },
+          { rootMargin: '0px 0px -12% 0px', threshold: 0.08 }
+        )
+
+    const initializeCharts = () => {
+      document.querySelectorAll('[data-chart]').forEach((root) => {
+        if (!(root instanceof HTMLElement) || root.dataset.chartInitialized) return
+        root.dataset.chartInitialized = 'true'
+        renderChart(root)
+        revealObserver?.observe(root)
+
+        const resizeObserver = new ResizeObserver(() => {
+          if (root.dataset.chartResizePending) return
+          root.dataset.chartResizePending = 'true'
+          requestAnimationFrame(() => {
+            delete root.dataset.chartResizePending
+            renderChart(root)
+          })
+        })
+        resizeObserver.observe(root)
+        chartRoots.add({ root, resizeObserver })
+      })
+
+      for (const entry of chartRoots) {
+        if (entry.root.isConnected) continue
+        entry.resizeObserver.disconnect()
+        chartRoots.delete(entry)
+      }
+    }
+
+    document.addEventListener('astro:page-load', initializeCharts)
+    if (document.readyState !== 'loading') initializeCharts()
+  })()
+</script>

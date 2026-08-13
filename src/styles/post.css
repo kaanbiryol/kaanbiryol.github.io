@@ -132,6 +132,152 @@
   font-weight: var(--font-weight-bold);
 }
 
+/* Data visualizations */
+.prose .data-chart {
+  --chart-series-1: var(--text-primary);
+  --chart-series-2: color-mix(in srgb, var(--text-primary) 58%, var(--bg));
+  --chart-series-3: color-mix(in srgb, var(--text-primary) 38%, var(--bg));
+  --chart-series-4: color-mix(in srgb, var(--text-primary) 22%, var(--bg));
+
+  margin: 2em 0 2.25em;
+  text-align: left;
+}
+
+.prose .data-chart__title {
+  color: var(--text-primary);
+  font-size: var(--font-size-m);
+  font-weight: var(--font-weight-bold);
+  line-height: 1.5;
+  margin-bottom: 0.625rem;
+  text-align: left;
+}
+
+.prose .data-chart__legend {
+  align-items: center;
+  color: var(--text-secondary);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem 1rem;
+  margin-bottom: 0.625rem;
+  min-height: 1.375rem;
+}
+
+.prose .data-chart__legend-item {
+  align-items: center;
+  display: inline-flex;
+  font-size: var(--font-size-s);
+  gap: 0.375rem;
+  line-height: 1.4;
+}
+
+.prose .data-chart__legend-swatch {
+  border: 1px solid color-mix(in srgb, var(--text-primary) 12%, transparent);
+  border-radius: 1px;
+  display: inline-block;
+  height: 0.625rem;
+  width: 0.625rem;
+}
+
+.prose .data-chart__canvas {
+  min-height: 1px;
+  width: 100%;
+}
+
+.prose .data-chart__svg {
+  display: block;
+  height: auto;
+  max-width: 100%;
+  overflow: visible;
+  width: 100%;
+}
+
+.prose .data-chart__svg text {
+  fill: var(--text-primary);
+  font-family: var(--sans);
+  font-size: 12px;
+}
+
+.prose .data-chart__svg .data-chart__tick,
+.prose .data-chart__svg .data-chart__axis-label,
+.prose .data-chart__svg .data-chart__series-label {
+  fill: var(--text-secondary);
+  font-size: 11px;
+}
+
+.prose .data-chart__svg .data-chart__category,
+.prose .data-chart__svg .data-chart__value {
+  font-weight: var(--font-weight-bold);
+}
+
+.prose .data-chart__svg .data-chart__grid-line,
+.prose .data-chart__svg .data-chart__axis-line,
+.prose .data-chart__svg .data-chart__tick-mark {
+  stroke: var(--border);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.prose .data-chart__svg .data-chart__grid-line {
+  stroke-dasharray: 2 4;
+}
+
+.prose .data-chart__svg .data-chart__segment-value {
+  fill: var(--bg);
+  font-size: 11px;
+  font-weight: var(--font-weight-bold);
+  pointer-events: none;
+}
+
+.prose .data-chart__bar {
+  transform: scaleX(0);
+  transform-box: fill-box;
+  transform-origin: left center;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1) var(--chart-delay, 0ms);
+}
+
+.prose .data-chart.is-visible .data-chart__bar {
+  transform: scaleX(1);
+}
+
+.prose .data-chart__line {
+  opacity: 0;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2;
+  transition: opacity 0.55s ease-out var(--chart-delay, 0ms);
+  vector-effect: non-scaling-stroke;
+}
+
+.prose .data-chart.is-visible .data-chart__line {
+  opacity: 1;
+}
+
+.prose .data-chart__point {
+  opacity: 0;
+  transition: opacity 0.25s ease-out var(--chart-delay, 0ms);
+}
+
+.prose .data-chart.is-visible .data-chart__point {
+  opacity: 1;
+}
+
+.prose .data-chart[data-chart-ready] .data-chart__table-wrap {
+  border: 0;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  padding: 0;
+  position: absolute;
+  white-space: nowrap;
+  width: 1px;
+}
+
+.prose .data-chart__source {
+  margin-bottom: 0;
+}
+
 /* Images */
 .prose img {
   max-width: 100%;
@@ -555,7 +701,7 @@
   --mermaid-edge: var(--text-tertiary);
   --mermaid-label-bg: var(--bg);
 
-  margin: 1.25em 0;
+  margin: 1.75em 0 2em;
   overflow-x: auto;
   padding-top: 2.75rem;
   position: relative;
@@ -563,15 +709,40 @@
 }
 
 .prose .mermaid > svg {
-  display: inline-block;
+  display: block;
   height: auto;
-  max-width: none;
-  min-width: 88rem;
+  margin: 0 auto;
+  max-width: 100%;
+  min-width: 0;
+  width: 100%;
 }
 
-@media (max-width: 768px) {
-  .prose .mermaid > svg {
-    min-width: 88rem;
+.prose .mermaid[data-diagram-motion] .node {
+  opacity: 0;
+}
+
+.prose .mermaid[data-diagram-motion].is-visible .node {
+  animation: diagram-node-in 0.4s ease-out var(--diagram-delay, 0ms) both;
+}
+
+.prose .mermaid[data-diagram-motion] .edgePath path,
+.prose .mermaid[data-diagram-motion] path.flowchart-link {
+  stroke-dasharray: var(--diagram-path-length);
+  stroke-dashoffset: var(--diagram-path-length);
+  transition: stroke-dashoffset 0.65s ease-out var(--diagram-delay, 0ms);
+}
+
+.prose .mermaid[data-diagram-motion].is-visible .edgePath path,
+.prose .mermaid[data-diagram-motion].is-visible path.flowchart-link {
+  stroke-dashoffset: 0;
+}
+
+@keyframes diagram-node-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
@@ -645,9 +816,9 @@
 
 .diagram-viewer-surface img {
   display: block;
-  width: 96rem;
-  max-width: none;
   height: auto;
+  max-width: none;
+  width: min(72rem, calc(100vw - 2rem));
 }
 
 .diagram-viewer-close {
@@ -691,6 +862,37 @@
 
 body.diagram-viewer-open {
   overflow: hidden;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .prose .data-chart__bar,
+  .prose .data-chart__line,
+  .prose .data-chart__point {
+    transition: none;
+  }
+
+  .prose .data-chart__bar {
+    transform: scaleX(1);
+  }
+
+  .prose .data-chart__line {
+    opacity: 1;
+  }
+
+  .prose .data-chart__point {
+    opacity: 1;
+  }
+
+  .prose .mermaid[data-diagram-motion] .node {
+    animation: none;
+    opacity: 1;
+  }
+
+  .prose .mermaid[data-diagram-motion] .edgePath path,
+  .prose .mermaid[data-diagram-motion] path.flowchart-link {
+    stroke-dashoffset: 0;
+    transition: none;
+  }
 }
 
 /* KaTeX Math Rendering */

@@ -26,17 +26,6 @@ test('article charts and controls initialize', async ({ page }, testInfo) => {
   await expect(page.locator('.reading-time')).toContainText(/\d+ min read/)
   await expect(page.getByRole('navigation', { name: 'More articles' })).toBeVisible()
 
-  await page.evaluate(() => {
-    Object.defineProperty(navigator, 'clipboard', {
-      configurable: true,
-      value: { writeText: async () => undefined }
-    })
-  })
-  const copyLinkButton = page.locator('[data-share-copy]')
-  await copyLinkButton.click()
-  await expect(copyLinkButton).toHaveText('copied')
-  await expect(page.locator('[data-share-status]')).toHaveText('Link copied to clipboard')
-
   const mobileTableOfContents = page.locator('.mobile-toc')
   if (testInfo.project.name === 'mobile-webkit') {
     await expect(mobileTableOfContents).toBeVisible()

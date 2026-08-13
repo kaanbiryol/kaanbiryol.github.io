@@ -21,6 +21,11 @@ export interface AdjacentPost {
   title: string
 }
 
+export interface RelatedPost extends AdjacentPost {
+  pubDate: Date
+  sharedTopics: string[]
+}
+
 // PostList component props interface
 export interface PostListProps {
   posts: CollectionEntry<'posts'>[]

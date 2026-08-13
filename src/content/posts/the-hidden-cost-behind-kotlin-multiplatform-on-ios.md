@@ -2,6 +2,7 @@
 title: 'The Hidden Cost Behind Kotlin Multiplatform on iOS'
 description: 'A benchmark-driven look at how Kotlin Multiplatform changes the iOS development feedback loop.'
 pubDate: 2026-06-14
+topics: ['ios', 'build performance', 'kotlin multiplatform']
 ---
 
 ## Introduction

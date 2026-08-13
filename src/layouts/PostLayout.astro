@@ -17,12 +17,24 @@ import XPOST from '@/components/ui/XPOST.astro'
 import CopyCode from '@/components/ui/CopyCode.astro'
 import DataCharts from '@/components/ui/DataCharts.astro'
 import PostNavigation from '@/components/ui/PostNavigation.astro'
+import RelatedWriting from '@/components/ui/RelatedWriting.astro'
+import TopicList from '@/components/ui/TopicList.astro'
 import BaseLayout from '@/layouts/BaseLayout.astro'
 import { renderInlineMarkdown, stripInlineMarkdown } from '@/utils/inline-markdown'
 
 import { themeConfig } from '@/config'
 
-const { title, description, pubDate, readingTime, toc, newerPost, olderPost } = Astro.props as PostLayoutProps
+const {
+  title,
+  description,
+  pubDate,
+  topics,
+  readingTime,
+  toc,
+  relatedPosts = [],
+  newerPost,
+  olderPost
+} = Astro.props as PostLayoutProps
 const plainTitle = stripInlineMarkdown(title)
 
 const postSlug = Astro.url.pathname.split('/').filter(Boolean).pop() || ''
@@ -57,12 +69,14 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
               )
             }
           </div>
+          <TopicList topics={topics} />
           <PostShare title={plainTitle} url={postUrl} />
         </div>
         {themeConfig.post.toc && <TableOfContents toc={toc} />}
         <article class="content">
           <slot />
         </article>
+        <RelatedWriting posts={relatedPosts} />
         <PostNavigation newerPost={newerPost} olderPost={olderPost} />
       </div>
     </main>

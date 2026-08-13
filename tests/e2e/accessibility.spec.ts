@@ -4,6 +4,7 @@ import { expect, test } from '@playwright/test'
 const representativePages = [
   { name: 'home page', path: '/' },
   { name: 'writing index', path: '/writing/' },
+  { name: 'topic page', path: '/writing/topics/swift/' },
   { name: 'article with charts', path: '/the-hidden-cost-behind-kotlin-multiplatform-on-ios/' }
 ]
 

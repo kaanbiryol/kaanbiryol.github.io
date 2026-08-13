@@ -15,6 +15,14 @@ test('core pages load with their primary content', async ({ page }) => {
   await page.goto('/writing/')
   await expect(page.getByRole('heading', { level: 1, name: 'Writing' })).toBeVisible()
   await expect(page.locator('main').getByRole('link')).not.toHaveCount(0)
+  await expect(page.locator('[data-topic-list]').first()).toBeVisible()
+
+  const swiftTopic = page.getByRole('link', { name: 'swift', exact: true }).first()
+  await expect(swiftTopic).toHaveAttribute('href', '/writing/topics/swift/')
+  await swiftTopic.click()
+  await expect(page).toHaveURL(/\/writing\/topics\/swift\/$/)
+  await expect(page.getByRole('heading', { level: 1, name: 'swift' })).toBeVisible()
+  await expect(page.getByText(/^\d+ posts$/)).toBeVisible()
 })
 
 test('article charts and controls initialize', async ({ page }, testInfo) => {
@@ -24,6 +32,10 @@ test('article charts and controls initialize', async ({ page }, testInfo) => {
   await expect(charts).toHaveCount(4)
   await expect(charts.locator('.data-chart__svg')).toHaveCount(4)
   await expect(page.locator('.reading-time')).toContainText(/\d+ min read/)
+  await expect(page.getByRole('list', { name: 'Topics', exact: true })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Topics', exact: true }).getByRole('link')).toHaveCount(3)
+  await expect(page.getByRole('region', { name: 'Related writing' })).toBeVisible()
+  await expect(page.getByRole('list', { name: 'Shared topics' }).first()).toContainText('build performance')
   await expect(page.getByRole('navigation', { name: 'More articles' })).toBeVisible()
 
   const mobileTableOfContents = page.locator('.mobile-toc')

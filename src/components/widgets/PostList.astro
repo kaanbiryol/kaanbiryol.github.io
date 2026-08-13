@@ -1,5 +1,6 @@
 ---
 import FormattedDate from '@/components/widgets/FormattedDate.astro'
+import TopicList from '@/components/ui/TopicList.astro'
 import type { PostListProps } from '@/types'
 import { renderInlineMarkdown } from '@/utils/inline-markdown'
 
@@ -31,24 +32,25 @@ const getExcerpt = (body?: string) => {
 }
 ---
 
-<ul>
+<ul class="post-list">
   {
     posts.map((post) => {
       const description = post.data.description ?? getExcerpt(post.body)
 
       return (
         <li>
-          <a href={`/${post.id}/`}>
-            <article class="post-item">
-              <div class="post-copy">
-                <h3 class="title" set:html={renderInlineMarkdown(post.data.title)} />
-                {description && <p class="description" set:html={renderInlineMarkdown(description)} />}
-              </div>
-              <p class="date font-features">
-                <FormattedDate date={post.data.pubDate} context="list" />
-              </p>
-            </article>
-          </a>
+          <article class="post-item">
+            <div class="post-copy">
+              <h3 class="title">
+                <a class="post-link" href={`/${post.id}/`} set:html={renderInlineMarkdown(post.data.title)} />
+              </h3>
+              {description && <p class="description" set:html={renderInlineMarkdown(description)} />}
+              <TopicList topics={post.data.topics} />
+            </div>
+            <p class="date font-features">
+              <FormattedDate date={post.data.pubDate} context="list" />
+            </p>
+          </article>
         </li>
       )
     })
@@ -57,7 +59,7 @@ const getExcerpt = (body?: string) => {
 {bottomSpace && <div class="placeholder" />}
 
 <style>
-  ul {
+  .post-list {
     padding: 0;
     margin: 0;
     list-style-type: none;
@@ -65,31 +67,32 @@ const getExcerpt = (body?: string) => {
     flex-direction: column;
   }
 
-  li {
+  .post-list > li {
     border-top: 1px solid var(--border);
-  }
-
-  li:first-child {
-    border-top: 0;
-  }
-
-  li:last-child {
-    border-bottom: 1px solid var(--border);
-  }
-
-  a {
-    color: var(--text-primary);
-    display: block;
-    text-decoration: none;
     transition: opacity 0.15s ease-out;
   }
 
+  .post-list > li:first-child {
+    border-top: 0;
+  }
+
+  .post-list > li:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .post-link {
+    color: var(--text-primary);
+    display: block;
+    text-decoration: none;
+  }
+
   @media (hover: hover) and (pointer: fine) {
-    ul:hover a {
+    .post-list:hover > li {
       opacity: 0.68;
     }
 
-    ul:hover a:hover {
+    .post-list > li:has(a:hover),
+    .post-list > li:focus-within {
       opacity: 1;
     }
   }
@@ -100,6 +103,13 @@ const getExcerpt = (body?: string) => {
     gap: 1rem;
     align-items: start;
     padding: 0.95rem 0;
+    position: relative;
+  }
+
+  .post-link::after {
+    content: '';
+    inset: 0;
+    position: absolute;
   }
 
   .title {

@@ -2,6 +2,7 @@ import { glob } from 'astro/loaders'
 import { defineCollection } from 'astro:content'
 import { z } from 'astro/zod'
 import { publicationConfig } from './config'
+import { normalizeTopic } from './utils/topics'
 
 const postPattern = publicationConfig.previewPost
   ? `${publicationConfig.previewPost}.md`
@@ -22,6 +23,15 @@ const posts = defineCollection({
       description: z.string(),
       // Transform string to Date object
       pubDate: z.coerce.date(),
+      topics: z
+        .array(
+          z
+            .string()
+            .trim()
+            .min(1)
+            .transform((topic) => normalizeTopic(topic))
+        )
+        .default([]),
       image: z.string().optional()
     })
 })

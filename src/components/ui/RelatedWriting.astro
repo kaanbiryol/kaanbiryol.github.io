@@ -1,0 +1,129 @@
+---
+import type { RelatedPost } from '@/types'
+import FormattedDate from '@/components/widgets/FormattedDate.astro'
+import TopicList from '@/components/ui/TopicList.astro'
+import { renderInlineMarkdown } from '@/utils/inline-markdown'
+
+interface Props {
+  posts?: RelatedPost[]
+}
+
+const { posts = [] } = Astro.props
+---
+
+{
+  posts.length > 0 && (
+    <section class="related-writing" aria-labelledby="related-writing-heading">
+      <h2 id="related-writing-heading">Related writing</h2>
+      <ul class="related-writing__list">
+        {posts.map((post) => (
+          <li>
+            <article>
+              <div>
+                <h3>
+                  <a class="related-writing__link" href={`/${post.id}/`} set:html={renderInlineMarkdown(post.title)} />
+                </h3>
+                <TopicList topics={post.sharedTopics} label="Shared topics" />
+              </div>
+              <p class="date font-features">
+                <FormattedDate date={post.pubDate} context="list" />
+              </p>
+            </article>
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
+<style>
+  .related-writing {
+    border-top: 1px solid var(--border);
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .related-writing h2 {
+    font-size: var(--font-size-m);
+    line-height: 1.5;
+    margin: 0 0 0.7rem;
+  }
+
+  .related-writing__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .related-writing__list > li {
+    border-top: 1px solid var(--border);
+    transition: opacity 0.15s ease-out;
+  }
+
+  .related-writing__list > li:first-child {
+    border-top: 0;
+  }
+
+  .related-writing__list > li:last-child {
+    border-bottom: 1px solid var(--border);
+  }
+
+  .related-writing__link {
+    color: var(--text-primary);
+    display: block;
+    text-decoration: none;
+  }
+
+  .related-writing__link:hover,
+  .related-writing__link:focus-visible {
+    text-decoration: none;
+  }
+
+  .related-writing article {
+    align-items: start;
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 0.85rem 0;
+    position: relative;
+  }
+
+  .related-writing__link::after {
+    content: '';
+    inset: 0;
+    position: absolute;
+  }
+
+  .related-writing h3 {
+    font-size: var(--font-size-m);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .related-writing .date {
+    margin: 0.1rem 0 0;
+    white-space: nowrap;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .related-writing__list:hover > li {
+      opacity: 0.68;
+    }
+
+    .related-writing__list > li:has(a:hover),
+    .related-writing__list > li:focus-within {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .related-writing article {
+      gap: 0.45rem;
+      grid-template-columns: 1fr;
+    }
+
+    .related-writing .date {
+      margin-top: 0;
+    }
+  }
+</style>

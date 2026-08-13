@@ -1,0 +1,72 @@
+---
+import { getTopicHref, normalizeTopic } from '@/utils/topics'
+
+interface Props {
+  topics: string[]
+  label?: string
+}
+
+const { topics, label = 'Topics' } = Astro.props
+---
+
+{
+  topics.length > 0 && (
+    <ul class="topic-list" aria-label={label} data-topic-list>
+      {topics.map((topic) => (
+        <li>
+          <a href={getTopicHref(topic)}>{normalizeTopic(topic)}</a>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+<style>
+  .topic-list {
+    align-items: center;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.375rem;
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+    position: relative;
+    z-index: 1;
+  }
+
+  .topic-list li {
+    margin: 0;
+    position: static;
+  }
+
+  .topic-list li::before {
+    content: none;
+    display: none;
+  }
+
+  .topic-list a {
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    color: var(--text-secondary);
+    display: inline-flex;
+    font-size: 0.72rem;
+    font-weight: var(--font-weight-light);
+    letter-spacing: 0;
+    line-height: 1.45;
+    padding: 0.1rem 0.45rem;
+    text-decoration: none;
+    transition:
+      background-color 0.15s ease-out,
+      border-color 0.15s ease-out,
+      color 0.15s ease-out;
+  }
+
+  .topic-list a:hover,
+  .topic-list a:focus-visible {
+    background: var(--code-bg);
+    border-color: var(--text-tertiary);
+    color: var(--text-primary);
+    text-decoration: none;
+  }
+</style>

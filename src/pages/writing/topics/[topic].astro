@@ -1,0 +1,88 @@
+---
+import type { CollectionEntry } from 'astro:content'
+import PostList from '@/components/widgets/PostList.astro'
+import { themeConfig } from '@/config'
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import { getSortedFilteredPosts } from '@/utils/draft'
+import { getTopicSlug, normalizeTopic, postHasTopic } from '@/utils/topics'
+
+export async function getStaticPaths() {
+  const posts = await getSortedFilteredPosts()
+  const topics = new Map<string, string>()
+
+  posts.forEach((post) => {
+    post.data.topics.forEach((topic) => topics.set(getTopicSlug(topic), normalizeTopic(topic)))
+  })
+
+  return Array.from(topics, ([slug, topic]) => ({
+    params: { topic: slug },
+    props: {
+      topic,
+      posts: posts.filter((post) => postHasTopic(post, topic))
+    }
+  }))
+}
+
+interface Props {
+  topic: string
+  posts: CollectionEntry<'posts'>[]
+}
+
+const { topic, posts } = Astro.props
+const postCount = `${posts.length} ${posts.length === 1 ? 'post' : 'posts'}`
+---
+
+<IndexLayout
+  title={`${topic} · Writing · ${themeConfig.site.title}`}
+  description={`Posts about ${topic} by ${themeConfig.site.author}.`}
+>
+  <section class="topic-page" aria-labelledby="topic-heading">
+    <a class="all-writing" href="/writing/">← all writing</a>
+    <div class="topic-heading">
+      <h1 id="topic-heading">{topic}</h1>
+      <p>{postCount}</p>
+    </div>
+    <PostList posts={posts} />
+  </section>
+</IndexLayout>
+
+<style>
+  .topic-page {
+    margin-top: 1.25rem;
+  }
+
+  .all-writing {
+    color: var(--text-secondary);
+    display: inline-block;
+    font-size: var(--font-size-s);
+    margin-bottom: 1.25rem;
+    text-decoration: none;
+  }
+
+  .all-writing:hover,
+  .all-writing:focus-visible {
+    color: var(--text-primary);
+  }
+
+  .topic-heading {
+    align-items: baseline;
+    display: flex;
+    gap: 0.75rem;
+    justify-content: space-between;
+    margin-bottom: 0.875rem;
+  }
+
+  h1 {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  .topic-heading p {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    margin: 0;
+    white-space: nowrap;
+  }
+</style>

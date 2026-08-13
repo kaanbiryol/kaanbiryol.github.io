@@ -4,6 +4,7 @@ import PostLayout from '@/layouts/PostLayout.astro'
 import { render } from 'astro:content'
 import type { AdjacentPost } from '@/types'
 import { getSortedFilteredPosts } from '@/utils/draft'
+import { getRelatedPosts } from '@/utils/related-posts'
 
 export async function getStaticPaths() {
   const posts = await getSortedFilteredPosts()
@@ -15,6 +16,7 @@ export async function getStaticPaths() {
       params: { slug: post.id },
       props: {
         post,
+        relatedPosts: getRelatedPosts(post, posts),
         newerPost: toAdjacentPost(posts[index - 1]),
         olderPost: toAdjacentPost(posts[index + 1])
       }
@@ -24,17 +26,25 @@ export async function getStaticPaths() {
 
 interface Props {
   post: CollectionEntry<'posts'>
+  relatedPosts: ReturnType<typeof getRelatedPosts>
   newerPost?: AdjacentPost
   olderPost?: AdjacentPost
 }
 
-const { post, newerPost, olderPost } = Astro.props
+const { post, relatedPosts, newerPost, olderPost } = Astro.props
 const { Content, remarkPluginFrontmatter } = await render(post)
 
 const readingTime = remarkPluginFrontmatter.readingTime
 const toc = remarkPluginFrontmatter.toc || []
 ---
 
-<PostLayout {...post.data} readingTime={readingTime} toc={toc} newerPost={newerPost} olderPost={olderPost}>
+<PostLayout
+  {...post.data}
+  readingTime={readingTime}
+  toc={toc}
+  relatedPosts={relatedPosts}
+  newerPost={newerPost}
+  olderPost={olderPost}
+>
   <Content />
 </PostLayout>

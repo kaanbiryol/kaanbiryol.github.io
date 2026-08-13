@@ -1,5 +1,6 @@
 ---
 title: 'The Compile-Time Cost of Swift Macros'
+description: 'A benchmark-driven investigation into how Swift macro expansion affects frontend type-checking time as usage scales.'
 pubDate: 2026-05-31
 ---
 

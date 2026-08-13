@@ -19,7 +19,7 @@ const posts = defineCollection({
   schema: () =>
     z.object({
       title: z.string(),
-      description: z.string().optional(),
+      description: z.string(),
       // Transform string to Date object
       pubDate: z.coerce.date(),
       image: z.string().optional()

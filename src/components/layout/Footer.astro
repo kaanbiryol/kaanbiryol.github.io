@@ -1,14 +1,10 @@
 ---
 import { themeConfig } from '@/config'
-const today = new Date()
 ---
 
 <footer>
   <div class="footer-content">
-    <div class="copyright">
-      <span class="date">&copy; {today.getFullYear()}</span>
-      {themeConfig.site.author}
-    </div>
+    <div class="copyright">&copy; {themeConfig.site.author}</div>
     <div class="powered-by">
       Powered by{' '}
       <a href="https://astro.build">Astro</a> &{' '}

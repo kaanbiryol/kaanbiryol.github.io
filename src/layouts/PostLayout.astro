@@ -35,6 +35,7 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
     title={`${plainTitle} · ${themeConfig.site.title}`}
     description={description}
     ogImage={ogImage}
+    article={{ headline: plainTitle, publishedTime: pubDate, author: themeConfig.site.author }}
     slot="head"
   />
   <div class="post-container">

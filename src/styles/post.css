@@ -457,7 +457,6 @@
   width: 1.5rem;
   text-align: left;
   color: var(--text-secondary);
-  opacity: 0.75;
   font-variant-numeric: tabular-nums;
   font-feature-settings:
     'tnum' 1,
@@ -497,7 +496,7 @@
   top: 0.15em;
   width: 1em;
   height: 1em;
-  border: 1.35px solid var(--text-tertiary);
+  border: 1.35px solid var(--text-secondary);
   border-radius: 4px;
   background: transparent;
   appearance: none;
@@ -508,8 +507,7 @@
   position: relative;
   background: var(--code-bg);
   font-family: var(--sans);
-  border: 1.35px solid var(--text-tertiary);
-  opacity: 0.75;
+  border: 1.35px solid var(--text-secondary);
 }
 
 .prose ul.contains-task-list li.task-list-item input[type='checkbox']:checked::after {
@@ -521,8 +519,7 @@
   font-family: var(--sans);
   font-size: 10px;
   font-weight: 650;
-  color: var(--text-primary);
-  opacity: 0.55;
+  color: var(--text-secondary);
 }
 
 .prose ul.contains-task-list li.task-list-item input[type='checkbox'] + * {
@@ -629,7 +626,6 @@
 .prose [data-footnote-ref],
 .prose [data-footnote-backref] {
   color: var(--text-secondary);
-  opacity: 0.875;
   text-decoration: none;
   transition: color 0.2s ease-out;
   padding-right: 0.125em;

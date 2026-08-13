@@ -8,5 +8,21 @@ const posts = await getSortedFilteredPosts()
 ---
 
 <IndexLayout title={`Writing · ${themeConfig.site.title}`} description={themeConfig.site.description}>
-  {posts.length > 0 && <PostList posts={posts} />}
+  <section class="writing-page" aria-labelledby="writing-heading">
+    <h1 id="writing-heading">Writing</h1>
+    {posts.length > 0 && <PostList posts={posts} />}
+  </section>
 </IndexLayout>
+
+<style>
+  .writing-page {
+    margin-top: 1.25rem;
+  }
+
+  h1 {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 0 0 0.875rem;
+  }
+</style>

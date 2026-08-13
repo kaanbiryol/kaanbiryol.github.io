@@ -1,4 +1,4 @@
-import type { TOCItem, ReadingTime } from './content.types'
+import type { AdjacentPost, TOCItem, ReadingTime } from './content.types'
 
 // TOC component props interface
 export interface TOCProps {
@@ -13,6 +13,8 @@ export interface PostLayoutProps {
   image?: string
   readingTime?: ReadingTime
   toc?: TOCItem[]
+  newerPost?: AdjacentPost | undefined
+  olderPost?: AdjacentPost | undefined
 }
 
 // Transition props interface

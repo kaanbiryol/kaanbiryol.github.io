@@ -1,33 +1,40 @@
 ---
-import { type CollectionEntry, getCollection } from 'astro:content'
+import type { CollectionEntry } from 'astro:content'
 import PostLayout from '@/layouts/PostLayout.astro'
 import { render } from 'astro:content'
-import { publicationConfig } from '@/config'
+import type { AdjacentPost } from '@/types'
+import { getSortedFilteredPosts } from '@/utils/draft'
 
 export async function getStaticPaths() {
-  if (!publicationConfig.publishPosts && !publicationConfig.previewPost) {
-    return []
-  }
+  const posts = await getSortedFilteredPosts()
+  return posts.map((post, index) => {
+    const toAdjacentPost = (entry: CollectionEntry<'posts'> | undefined): AdjacentPost | undefined =>
+      entry ? { id: entry.id, title: entry.data.title } : undefined
 
-  const posts = await getCollection('posts')
-  return posts
-    .filter((post) => !post.id.startsWith('_'))
-    .filter((post) => !publicationConfig.previewPost || post.id === publicationConfig.previewPost)
-    .map((post) => ({
+    return {
       params: { slug: post.id },
-      props: post
-    }))
+      props: {
+        post,
+        newerPost: toAdjacentPost(posts[index - 1]),
+        olderPost: toAdjacentPost(posts[index + 1])
+      }
+    }
+  })
 }
 
-type Props = CollectionEntry<'posts'>
+interface Props {
+  post: CollectionEntry<'posts'>
+  newerPost?: AdjacentPost
+  olderPost?: AdjacentPost
+}
 
-const post = Astro.props
+const { post, newerPost, olderPost } = Astro.props
 const { Content, remarkPluginFrontmatter } = await render(post)
 
 const readingTime = remarkPluginFrontmatter.readingTime
 const toc = remarkPluginFrontmatter.toc || []
 ---
 
-<PostLayout {...post.data} readingTime={readingTime} toc={toc}>
+<PostLayout {...post.data} readingTime={readingTime} toc={toc} newerPost={newerPost} olderPost={olderPost}>
   <Content />
 </PostLayout>

@@ -16,6 +16,11 @@ export interface TOCItem {
   index: number
 }
 
+export interface AdjacentPost {
+  id: string
+  title: string
+}
+
 // PostList component props interface
 export interface PostListProps {
   posts: CollectionEntry<'posts'>[]

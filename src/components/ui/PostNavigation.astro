@@ -1,0 +1,96 @@
+---
+import type { AdjacentPost } from '@/types'
+import { renderInlineMarkdown } from '@/utils/inline-markdown'
+
+interface Props {
+  newerPost?: AdjacentPost | undefined
+  olderPost?: AdjacentPost | undefined
+}
+
+const { newerPost, olderPost } = Astro.props
+---
+
+{
+  (newerPost || olderPost) && (
+    <nav class="post-navigation" aria-label="More articles">
+      {newerPost && (
+        <a class="post-navigation__link post-navigation__link--newer" href={`/${newerPost.id}/`}>
+          <span class="post-navigation__direction">← Newer post</span>
+          <span class="post-navigation__title" set:html={renderInlineMarkdown(newerPost.title)} />
+        </a>
+      )}
+      {olderPost && (
+        <a class="post-navigation__link post-navigation__link--older" href={`/${olderPost.id}/`}>
+          <span class="post-navigation__direction">Older post →</span>
+          <span class="post-navigation__title" set:html={renderInlineMarkdown(olderPost.title)} />
+        </a>
+      )}
+    </nav>
+  )
+}
+
+<style>
+  .post-navigation {
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin-top: 3.5rem;
+    padding-top: 1.5rem;
+  }
+
+  .post-navigation__link {
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    min-width: 0;
+    padding: 0.875rem;
+    text-decoration: none;
+    transition:
+      background-color 0.15s ease-out,
+      border-color 0.15s ease-out;
+  }
+
+  .post-navigation__link:hover,
+  .post-navigation__link:focus-visible {
+    background: var(--code-bg);
+    border-color: var(--text-tertiary);
+    text-decoration: none;
+  }
+
+  .post-navigation__link--older {
+    grid-column: 2;
+    text-align: right;
+  }
+
+  .post-navigation__direction {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.4;
+  }
+
+  .post-navigation__title {
+    color: var(--text-primary);
+    font-size: var(--font-size-m);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .post-navigation__title :global(code) {
+    font-size: 0.9em;
+  }
+
+  @media (max-width: 620px) {
+    .post-navigation {
+      grid-template-columns: 1fr;
+    }
+
+    .post-navigation__link--older {
+      grid-column: 1;
+      text-align: left;
+    }
+  }
+</style>

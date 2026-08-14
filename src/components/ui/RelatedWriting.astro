@@ -57,15 +57,22 @@ const { posts = [] } = Astro.props
 
   .related-writing__list > li {
     border-top: 1px solid var(--border);
+    margin: 0;
+    padding: 0;
     transition: opacity 0.15s ease-out;
+  }
+
+  .related-writing__list > li::before {
+    content: none;
+    display: none;
   }
 
   .related-writing__list > li:first-child {
     border-top: 0;
   }
 
-  .related-writing__list > li:last-child {
-    border-bottom: 1px solid var(--border);
+  .related-writing__list > li:last-child article {
+    padding-bottom: 0.35rem;
   }
 
   .related-writing__link {

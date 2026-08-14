@@ -39,6 +39,12 @@ const { newerPost, olderPost } = Astro.props
     padding-top: 1.5rem;
   }
 
+  :global(.related-writing) + .post-navigation {
+    border-top: 0;
+    margin-top: 1.25rem;
+    padding-top: 0;
+  }
+
   .post-navigation__link {
     border: 1px solid var(--border);
     border-radius: 0.5rem;
@@ -63,6 +69,10 @@ const { newerPost, olderPost } = Astro.props
   .post-navigation__link--older {
     grid-column: 2;
     text-align: right;
+  }
+
+  .post-navigation__link:only-child {
+    grid-column: 1 / -1;
   }
 
   .post-navigation__direction {

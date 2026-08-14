@@ -5,12 +5,14 @@ import { normalizeTopic } from '@/utils/topics'
 export function getRelatedPosts(
   currentPost: CollectionEntry<'posts'>,
   posts: CollectionEntry<'posts'>[],
-  limit = 3
+  limit = 3,
+  excludedPostIds: string[] = []
 ): RelatedPost[] {
   const currentTopics = new Set(currentPost.data.topics.map(normalizeTopic))
+  const excludedIds = new Set([currentPost.id, ...excludedPostIds])
 
   return posts
-    .filter((post) => post.id !== currentPost.id)
+    .filter((post) => !excludedIds.has(post.id))
     .map((post) => {
       const sharedTopics = post.data.topics.filter((topic: string) => currentTopics.has(normalizeTopic(topic)))
 

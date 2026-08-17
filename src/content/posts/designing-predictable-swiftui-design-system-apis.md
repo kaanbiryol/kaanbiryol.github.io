@@ -22,7 +22,7 @@ DSButton(
     "Continue",
     image: Image(systemName: "arrow.right"),
     size: .small,
-    variant: .filled
+    variant: .outlined
 ) {
     submit()
 }
@@ -190,7 +190,7 @@ Button("Submit") {}
 
 Why does a `Button` offer a `textFieldStyle` modifier even though it does not contain a `TextField`? The API surface for each component should be minimal and have only what is required.
 
-Protocols can narrow this API surface to the components you own, but they do not change the underlying boundary: a `ViewModifier` still cannot inspect private component state or configure internal layout.
+Protocols can narrow this API surface to the components you own, but they do not change the underlying boundary: a `ViewModifier` has no direct access to the component’s private state or internal layout.
 
 ### View styles
 

@@ -9,9 +9,15 @@ export interface ReadingTime {
 }
 
 // TOC item interface
+export interface TOCContentPart {
+  type: 'text' | 'code'
+  value: string
+}
+
 export interface TOCItem {
   level: number
   text: string
+  parts?: TOCContentPart[]
   id: string
   index: number
 }

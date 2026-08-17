@@ -1,3 +1,4 @@
+import { toString } from 'mdast-util-to-string'
 import { visit } from 'unist-util-visit'
 
 export default function remarkTOC() {
@@ -33,6 +34,7 @@ export default function remarkTOC() {
       headings.push({
         level,
         text,
+        parts: extractContentParts(node),
         id,
         index: headingIndex
       })
@@ -48,13 +50,22 @@ export default function remarkTOC() {
 }
 
 function extractTextContent(node) {
-  let text = ''
+  return toString(node).trim()
+}
 
-  visit(node, 'text', (textNode) => {
-    text += textNode.value
+function extractContentParts(node) {
+  const parts = []
+
+  visit(node, (child) => {
+    if (child.type === 'text' || child.type === 'inlineCode') {
+      parts.push({
+        type: child.type === 'inlineCode' ? 'code' : 'text',
+        value: child.value
+      })
+    }
   })
 
-  return text.trim()
+  return parts
 }
 
 // Generate a slug from text

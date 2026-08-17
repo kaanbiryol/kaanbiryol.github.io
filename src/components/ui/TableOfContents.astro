@@ -14,7 +14,9 @@ const { toc = [] }: TOCProps = Astro.props
             {toc.map((item) => (
               <li class={`toc-item toc-level-${item.level}`}>
                 <a href={`#${item.id}`} class="toc-link" title={item.text}>
-                  {item.text}
+                  {item.parts?.length
+                    ? item.parts.map((part) => (part.type === 'code' ? <code>{part.value}</code> : part.value))
+                    : item.text}
                 </a>
               </li>
             ))}
@@ -33,7 +35,11 @@ const { toc = [] }: TOCProps = Astro.props
           <ul class="mobile-toc-list">
             {toc.map((item) => (
               <li class={`mobile-toc-item toc-level-${item.level}`}>
-                <a href={`#${item.id}`}>{item.text}</a>
+                <a href={`#${item.id}`}>
+                  {item.parts?.length
+                    ? item.parts.map((part) => (part.type === 'code' ? <code>{part.value}</code> : part.value))
+                    : item.text}
+                </a>
               </li>
             ))}
           </ul>

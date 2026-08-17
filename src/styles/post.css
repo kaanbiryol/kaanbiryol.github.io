@@ -90,8 +90,7 @@
 }
 
 .prose .content .linked-heading:hover .heading-link-symbol,
-.prose .content .heading-link:focus-visible .heading-link-symbol,
-.prose .content .linked-heading:target .heading-link-symbol {
+.prose .content .heading-link:focus-visible .heading-link-symbol {
   color: var(--text-primary);
   opacity: 1;
 }

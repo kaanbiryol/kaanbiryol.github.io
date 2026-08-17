@@ -1,21 +1,16 @@
 ---
 import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
 
-const description =
-  'A native workspace for reviewing GitHub pull requests, following checks and logs, and managing local worktrees.'
+const description = 'A native macOS app for reviewing pull requests, following CI, and working with local worktrees.'
 ---
 
 <WorkProjectLayout
   title="Harbor"
   {description}
-  eyebrow="Open source · macOS"
+  eyebrow="Open source · macOS app"
   sourceHref="https://github.com/kaanbiryol/harbor"
-  visualCaption="Reviewing a pull request and its unresolved inline discussion in Harbor."
-  facts={[
-    { label: 'Platform', value: 'macOS' },
-    { label: 'Built with', value: 'Rust · GPUI' },
-    { label: 'Status', value: 'Early development' }
-  ]}
+  visualCaption="Harbor showing a pull request diff with an unresolved inline thread."
+  details={{ type: 'Native macOS app', focus: 'Pull request review', stack: 'Rust · GPUI' }}
 >
   <img
     slot="visual"
@@ -27,14 +22,14 @@ const description =
     decoding="async"
   />
 
-  <h2>The review loop, in one focused app</h2>
+  <h2>Why I’m building Harbor</h2>
   <p>
-    Harbor brings repository switching, pull request inboxes, changed files, inline review threads, checks, workflow
-    runs, and logs into a single native workspace.
+    Reviewing a pull request often means jumping between GitHub, CI logs, and a terminal. Harbor keeps repositories,
+    changed files, inline threads, checks, workflow runs, logs, and local worktrees in one native app.
   </p>
   <p>
-    I’m building it in Rust with GPUI, using GitHub’s REST and GraphQL APIs alongside a local SQLite cache. It is early
-    software, with the core workflow currently developed and tested for macOS.
+    I’m building it in Rust with GPUI. It talks to GitHub through REST and GraphQL, and keeps a local SQLite cache. The
+    project is still early and currently focused on macOS.
   </p>
 </WorkProjectLayout>
 

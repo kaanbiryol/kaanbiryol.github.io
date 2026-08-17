@@ -43,8 +43,7 @@ const tools = [
     name: 'harbor',
     sourceHref: 'https://github.com/kaanbiryol/harbor',
     detailHref: '/work/harbor/',
-    description:
-      'Native Rust app for GitHub pull request workflows, review threads, checks, logs, and local worktrees.',
+    description: 'A native macOS app for reviewing pull requests, following CI, and working with local worktrees.',
     language: 'Rust',
     languageColor: '#dea584',
     pushedAt: '2026-07-07T19:33:54Z'
@@ -53,7 +52,7 @@ const tools = [
     name: 'swift_unused_deps',
     sourceHref: 'https://github.com/kaanbiryol/swift_unused_deps',
     detailHref: '/work/swift-unused-deps/',
-    description: 'Detect unused and missing direct Bazel dependencies for Swift targets.',
+    description: 'A Bazel check for unused and missing direct dependencies in Swift targets.',
     language: 'Swift',
     languageColor: '#f05138',
     pushedAt: '2026-06-26T17:12:59Z'
@@ -62,8 +61,7 @@ const tools = [
     name: 'obsidian-crate',
     sourceHref: 'https://github.com/kaanbiryol/obsidian-crate',
     detailHref: '/work/obsidian-crate/',
-    description:
-      'Self-hosted Obsidian vault sync and reminders using Cloudflare R2, Workers, D1, and push notifications.',
+    description: 'An Obsidian plugin for syncing vaults and scheduling reminders from your own Cloudflare account.',
     language: 'TypeScript',
     languageColor: '#3178c6',
     pushedAt: '2026-07-03T21:03:59Z'
@@ -72,7 +70,7 @@ const tools = [
     name: 'init-revise-cli',
     sourceHref: 'https://github.com/kaanbiryol/init-revise-cli',
     detailHref: '/work/init-revise-cli/',
-    description: 'Swift CLI that rewrites type-inferred initializations to explicit ones using SwiftSyntax.',
+    description: 'A Swift CLI that asks SourceKit for the type behind .init shorthand, then writes it explicitly.',
     language: 'Swift',
     languageColor: '#f05138',
     pushedAt: '2026-05-15T17:04:56Z'
@@ -81,7 +79,7 @@ const tools = [
     name: 'tuist-to-bazel',
     sourceHref: 'https://github.com/kaanbiryol/tuist-to-bazel',
     detailHref: '/work/tuist-to-bazel/',
-    description: 'Generate Bazel BUILD files from a Tuist project graph.',
+    description: 'A migration tool that turns a Tuist project graph into Bazel files you can inspect and edit.',
     language: 'Swift',
     languageColor: '#f05138',
     pushedAt: '2026-06-15T21:31:57Z'
@@ -95,7 +93,7 @@ const visibleTools = isFull ? tools : tools.slice(0, 3)
   {
     !isFull && (
       <div class="section-header">
-        <h2 id={headingId}>Latest Work</h2>
+        <h2 id={headingId}>Latest work</h2>
         <a href="/work/">All work</a>
       </div>
     )
@@ -104,11 +102,11 @@ const visibleTools = isFull ? tools : tools.slice(0, 3)
   {
     isFull && (
       <h1 id={headingId} class="subheading">
-        Open-source
+        Open source
       </h1>
     )
   }
-  {isFull && <p class="section-note">Selected projects and tools I maintain.</p>}
+  {isFull && <p class="section-note">Projects and tools I maintain.</p>}
   <ul class="project-list">
     {
       visibleTools.map((project) => (
@@ -147,12 +145,10 @@ const visibleTools = isFull ? tools : tools.slice(0, 3)
     isFull && (
       <section class="detail-section" aria-labelledby="app-work-heading">
         <div class="section-header secondary">
-          <h2 id="app-work-heading">iOS Applications</h2>
+          <h2 id="app-work-heading">iOS apps</h2>
         </div>
 
-        <p class="section-note">
-          I worked on these iOS apps professionally across mobility, banking, insurance, and payments.
-        </p>
+        <p class="section-note">Apps I worked on across mobility, banking, insurance, and payments.</p>
         <ul class="app-link-list" aria-label="Professional iOS app work">
           {iosApps.map((project) => (
             <li>

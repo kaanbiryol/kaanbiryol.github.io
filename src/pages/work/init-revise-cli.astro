@@ -1,20 +1,16 @@
 ---
 import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
 
-const description = 'A Swift CLI that replaces inferred initializers with explicit types resolved through SourceKit.'
+const description = 'A Swift CLI that asks SourceKit for the type behind .init shorthand, then writes it explicitly.'
 ---
 
 <WorkProjectLayout
   title="init-revise-cli"
   {description}
-  eyebrow="Open source · Swift compiler tooling"
+  eyebrow="Open source · Swift CLI"
   sourceHref="https://github.com/kaanbiryol/init-revise-cli"
-  visualCaption="SourceKit resolves each inferred type before SwiftSyntax rewrites the source in place."
-  facts={[
-    { label: 'Platform', value: 'Swift toolchain' },
-    { label: 'Built with', value: 'SourceKit · SwiftSyntax' },
-    { label: 'Transformation', value: '.init → explicit type' }
-  ]}
+  visualCaption="SourceKit resolves each type, then SwiftSyntax updates the source without touching the surrounding code."
+  details={{ type: 'Command-line tool', focus: 'Source rewriting', stack: 'SourceKit · SwiftSyntax' }}
 >
   <div slot="visual" class="code-visual" aria-label="Before and after Swift initializer transformation">
     <div class="code-bar">
@@ -47,14 +43,14 @@ models = [
     </div>
   </div>
 
-  <h2>Give the type checker a direct path</h2>
+  <h2>Making inferred initializers explicit</h2>
   <p>
-    In complex Swift expressions, implicit <code>.init(...)</code> calls can leave more work for the type checker. init-revise-cli
-    asks SourceKit for the resolved expression type and replaces the shorthand with its fully qualified initializer.
+    In a complex Swift expression, <code>.init(...)</code> leaves the compiler to work out the type from context. init-revise-cli
+    asks SourceKit for the resolved type and writes the fully qualified initializer back into the file.
   </p>
   <p>
-    SwiftSyntax performs the source transformation while preserving the surrounding code. The tool handles optionals,
-    arrays, and nested types, and can process an Xcode project using per-file compiler arguments.
+    SwiftSyntax handles the edit and preserves the surrounding code. The tool supports optionals, arrays, nested types,
+    and whole Xcode projects using per-file compiler arguments.
   </p>
 </WorkProjectLayout>
 

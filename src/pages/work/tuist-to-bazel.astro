@@ -1,20 +1,16 @@
 ---
 import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
 
-const description = 'A Swift command-line tool that converts a Tuist project graph into inspectable Bazel files.'
+const description = 'A Swift CLI that turns a Tuist project graph into Bazel files you can inspect and edit.'
 ---
 
 <WorkProjectLayout
   title="tuist-to-bazel"
   {description}
-  eyebrow="Open source · iOS build systems"
+  eyebrow="Open source · iOS build tooling"
   sourceHref="https://github.com/kaanbiryol/tuist-to-bazel"
-  visualCaption="The converter turns Tuist’s exported graph into ordinary Bazel files and generated support sources."
-  facts={[
-    { label: 'Input', value: 'Tuist graph JSON' },
-    { label: 'Built with', value: 'Swift · Bazel' },
-    { label: 'Output', value: 'MODULE · BUILD files' }
-  ]}
+  visualCaption="The converter reads Tuist’s graph and writes regular Bazel files plus the support sources the project needs."
+  details={{ type: 'Migration tool', focus: 'Tuist → Bazel', stack: 'Swift · Bazel' }}
 >
   <div slot="visual" class="conversion-visual" aria-label="Tuist graph to Bazel file conversion">
     <div class="source-panel">
@@ -41,15 +37,12 @@ const description = 'A Swift command-line tool that converts a Tuist project gra
     </div>
   </div>
 
-  <h2>A migration artifact you can inspect and evolve</h2>
+  <h2>Start with Bazel files you can edit</h2>
   <p>
-    tuist-to-bazel reads the JSON emitted by <code>tuist graph</code> through narrow local data types, then generates a Bazel
-    module, per-package BUILD files, and the support sources needed by the converted project.
+    tuist-to-bazel reads the JSON from <code>tuist graph</code> and creates <code>MODULE.bazel</code>, one BUILD file
+    per package, and the support sources Bazel needs.
   </p>
-  <p>
-    The result is ordinary Bazel configuration rather than a hidden compatibility layer. It can be reviewed, edited,
-    queried, and built directly while a team moves its iOS project toward Bazel.
-  </p>
+  <p>These are regular Bazel files. You can review and edit them as you move the project over.</p>
 </WorkProjectLayout>
 
 <style>

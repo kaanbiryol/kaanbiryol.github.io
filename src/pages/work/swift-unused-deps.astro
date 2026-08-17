@@ -1,22 +1,18 @@
 ---
 import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
 
-const description = 'Find dependency mistakes in Swift Bazel targets—and generate safe fixes.'
+const description = 'A Bazel check for unused and missing direct dependencies in Swift targets, with generated fixes.'
 ---
 
 <WorkProjectLayout
   title="swift_unused_deps"
   {description}
-  eyebrow="Open source · Swift build tooling"
+  eyebrow="Open source · Bazel"
   sourceHref="https://github.com/kaanbiryol/swift_unused_deps"
   secondaryHref="https://github.com/kaanbiryol/swift_unused_deps#setup"
   secondaryLabel="Setup"
-  visualCaption="A fixture-backed check finds two dependency mistakes, applies their fix plan, and verifies a clean graph."
-  facts={[
-    { label: 'Integration', value: 'bazel test' },
-    { label: 'Evidence', value: 'SwiftInfo · index store' },
-    { label: 'Actions', value: 'Check · report · fix' }
-  ]}
+  visualCaption="The check finds two dependency issues, applies the generated fixes, then passes on the next run."
+  details={{ type: 'Build tool', focus: 'Dependency hygiene', stack: 'Swift · Starlark' }}
 >
   <div slot="visual" class="terminal-visual" aria-label="swift_unused_deps check, fix, and verification demo">
     <div class="terminal-bar">
@@ -69,30 +65,30 @@ const description = 'Find dependency mistakes in Swift Bazel targets—and gener
     </div>
   </div>
 
-  <h2>Dependency mistakes, surfaced where you already work</h2>
+  <h2>A dependency check that runs with the rest of your tests</h2>
   <p>
-    The check runs as an ordinary <code>bazel test</code>, reads the analyzed Swift graph, and turns compiler and
-    index-store evidence into findings that CI can enforce. Its generated fix target applies high-confidence BUILD and
-    source edits, then lets the same test prove the graph is clean.
+    swift_unused_deps runs as a regular <code>bazel test</code>. It reads <code>SwiftInfo</code> and the index store to catch
+    mistakes in the analyzed graph, so the same check works locally and in CI. When a fix is safe to automate, the generated
+    fix target updates the BUILD or source file. Run the test again to verify the graph is clean.
   </p>
 
   <h3>What it catches</h3>
   <ul class="capabilities">
     <li>
       <strong>Unused dependency</strong>
-      <span>Declared in BUILD, but never loaded.</span>
+      <span>Listed in BUILD, but never loaded.</span>
     </li>
     <li>
       <strong>Unused import</strong>
-      <span>Imported in Swift, but no symbols are referenced.</span>
+      <span>Present in the source, but no symbols are used.</span>
     </li>
     <li>
       <strong>Missing direct dependency</strong>
-      <span>Imported directly, but only reachable transitively.</span>
+      <span>Used by the target, but only available through another dependency.</span>
     </li>
     <li>
       <strong>Private dependency candidate</strong>
-      <span>Used internally, with nothing exposed through the public API.</span>
+      <span>Used internally and not exposed through the public API.</span>
     </li>
   </ul>
 </WorkProjectLayout>

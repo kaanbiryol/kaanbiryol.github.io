@@ -2,9 +2,10 @@
 import IndexLayout from '@/layouts/IndexLayout.astro'
 import { themeConfig } from '@/config'
 
-interface ProjectFact {
-  label: string
-  value: string
+interface ProjectDetails {
+  type: string
+  focus: string
+  stack: string
 }
 
 interface Props {
@@ -14,12 +15,19 @@ interface Props {
   sourceHref: string
   secondaryHref?: string
   secondaryLabel?: string
-  visualCaption: string
-  facts: ProjectFact[]
+  visualCaption?: string
+  details: ProjectDetails
 }
 
-const { title, description, eyebrow, sourceHref, secondaryHref, secondaryLabel, visualCaption, facts } =
+const { title, description, eyebrow, sourceHref, secondaryHref, secondaryLabel, visualCaption, details } =
   Astro.props as Props
+
+const projectDetails = [
+  { label: 'Type', value: details.type },
+  { label: 'Focus', value: details.focus },
+  { label: 'Stack', value: details.stack }
+]
+const hasVisual = Astro.slots.has('visual')
 ---
 
 <IndexLayout title={`${title} · ${themeConfig.site.title}`} description={description}>
@@ -44,12 +52,16 @@ const { title, description, eyebrow, sourceHref, secondaryHref, secondaryLabel, 
       <p class="lead">{description}</p>
     </header>
 
-    <figure class="project-visual">
-      <div class="visual-frame">
-        <slot name="visual" />
-      </div>
-      <figcaption>{visualCaption}</figcaption>
-    </figure>
+    {
+      hasVisual && (
+        <figure class="project-visual">
+          <div class="visual-frame">
+            <slot name="visual" />
+          </div>
+          {visualCaption && <figcaption>{visualCaption}</figcaption>}
+        </figure>
+      )
+    }
 
     <section class="project-copy" aria-label={`${title} overview`}>
       <slot />
@@ -57,10 +69,10 @@ const { title, description, eyebrow, sourceHref, secondaryHref, secondaryLabel, 
 
     <dl class="project-facts" aria-label="Project details">
       {
-        facts.map((fact) => (
+        projectDetails.map((detail) => (
           <div>
-            <dt>{fact.label}</dt>
-            <dd>{fact.value}</dd>
+            <dt>{detail.label}</dt>
+            <dd>{detail.value}</dd>
           </div>
         ))
       }

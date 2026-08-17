@@ -30,11 +30,11 @@ test('core pages load with their primary content', async ({ page }) => {
 
 test('work links to each project showcase', async ({ page }) => {
   const projects = [
-    { link: 'harbor', path: 'harbor', heading: 'Harbor' },
-    { link: 'swift_unused_deps', path: 'swift-unused-deps', heading: 'swift_unused_deps' },
-    { link: 'obsidian-crate', path: 'obsidian-crate', heading: 'Crate' },
-    { link: 'init-revise-cli', path: 'init-revise-cli', heading: 'init-revise-cli' },
-    { link: 'tuist-to-bazel', path: 'tuist-to-bazel', heading: 'tuist-to-bazel' }
+    { link: 'harbor', path: 'harbor', heading: 'Harbor', hasVisual: true },
+    { link: 'swift_unused_deps', path: 'swift-unused-deps', heading: 'swift_unused_deps', hasVisual: true },
+    { link: 'obsidian-crate', path: 'obsidian-crate', heading: 'Crate', hasVisual: false },
+    { link: 'init-revise-cli', path: 'init-revise-cli', heading: 'init-revise-cli', hasVisual: true },
+    { link: 'tuist-to-bazel', path: 'tuist-to-bazel', heading: 'tuist-to-bazel', hasVisual: true }
   ]
 
   for (const project of projects) {
@@ -43,8 +43,13 @@ test('work links to each project showcase', async ({ page }) => {
 
     await expect(page).toHaveURL(new RegExp(`/work/${project.path}/$`))
     await expect(page.getByRole('heading', { level: 1, name: project.heading })).toBeVisible()
-    await expect(page.getByRole('figure')).toBeVisible()
+    if (project.hasVisual) {
+      await expect(page.getByRole('figure')).toBeVisible()
+    } else {
+      await expect(page.getByRole('figure')).toHaveCount(0)
+    }
     await expect(page.getByRole('link', { name: 'Work', exact: true })).toHaveAttribute('aria-current', 'location')
+    await expect(page.locator('.project-facts dt')).toHaveText(['Type', 'Focus', 'Stack'])
 
     const pageWidth = await page.evaluate(() => ({
       content: document.documentElement.scrollWidth,

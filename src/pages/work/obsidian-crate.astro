@@ -1,191 +1,23 @@
 ---
 import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
 
-const description = 'Self-hosted Obsidian vault sync and reminders running inside your own Cloudflare account.'
+const description = 'An Obsidian plugin that keeps vault sync and reminders inside your own Cloudflare account.'
 ---
 
 <WorkProjectLayout
   title="Crate"
   {description}
-  eyebrow="Open source · Self-hosted infrastructure"
+  eyebrow="Open source · Obsidian"
   sourceHref="https://github.com/kaanbiryol/obsidian-crate"
-  visualCaption="Crate keeps sync storage, metadata, and reminder scheduling inside infrastructure you control."
-  facts={[
-    { label: 'Platform', value: 'Obsidian · Cloudflare' },
-    { label: 'Built with', value: 'TypeScript · Workers' },
-    { label: 'Status', value: 'Early development' }
-  ]}
+  details={{ type: 'Obsidian plugin', focus: 'Self-hosted sync', stack: 'TypeScript · Cloudflare' }}
 >
-  <div slot="visual" class="crate-visual" aria-label="Crate self-hosted architecture">
-    <div class="vault-side">
-      <span class="visual-label">Your devices</span>
-      <div class="device-row">
-        <div class="node device"><span>Obsidian</span><small>Desktop vault</small></div>
-        <div class="node device"><span>Obsidian</span><small>Mobile vault</small></div>
-      </div>
-    </div>
-    <div class="sync-path" aria-hidden="true">
-      <span>encrypted transport</span>
-      <i></i>
-    </div>
-    <div class="cloud-side">
-      <span class="visual-label">Your Cloudflare account</span>
-      <div class="node worker"><span>Worker</span><small>Sync API</small></div>
-      <div class="storage-row">
-        <div class="node service"><span>R2</span><small>Vault files</small></div>
-        <div class="node service"><span>D1</span><small>Metadata</small></div>
-        <div class="node service"><span>Durable Objects</span><small>Reminders</small></div>
-      </div>
-    </div>
-  </div>
-
-  <h2>Vault sync without handing over the infrastructure</h2>
+  <h2>Sync that runs in your own account</h2>
   <p>
-    Crate is an Obsidian plugin for people who want to own the infrastructure behind their vault sync. It handles file
-    changes, renames, attachments, conflict preservation, devices, and reminders through a Worker in the user’s
-    Cloudflare account.
+    Crate tracks file changes, renames, attachments, conflicts, and devices. The plugin talks to a Worker deployed in
+    your Cloudflare account, which also handles reminders.
   </p>
   <p>
-    File contents live in R2, sync metadata in D1, and reminder alarms in Durable Objects. Crate is not a hosted service
-    and does not require a separate Crate account.
+    R2 stores the files, D1 stores sync metadata, and Durable Objects schedule reminder alarms. The project is still
+    early. There is no hosted Crate service or separate account.
   </p>
 </WorkProjectLayout>
-
-<style>
-  .crate-visual {
-    align-items: center;
-    color: rgba(255, 255, 255, 0.9);
-    display: grid;
-    gap: 2rem;
-    grid-template-columns: minmax(12rem, 0.8fr) 8rem minmax(18rem, 1.2fr);
-    min-height: 31rem;
-    padding: 3rem;
-  }
-
-  .visual-label {
-    color: rgba(255, 255, 255, 0.55);
-    display: block;
-    font-size: 0.7rem;
-    letter-spacing: 0.08em;
-    margin-bottom: 0.75rem;
-    text-transform: uppercase;
-  }
-
-  .device-row,
-  .storage-row {
-    display: grid;
-    gap: 0.75rem;
-  }
-
-  .storage-row {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    margin-top: 0.75rem;
-  }
-
-  .node {
-    background: rgba(255, 255, 255, 0.045);
-    border: 1px solid rgba(255, 255, 255, 0.12);
-    border-radius: 0.5rem;
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-  }
-
-  .node span {
-    font-size: 0.8125rem;
-    font-weight: 500;
-    line-height: 1.5;
-  }
-
-  .node small {
-    color: rgba(255, 255, 255, 0.6);
-    font-size: 0.7rem;
-    line-height: 1.5;
-    margin-top: 0.15rem;
-  }
-
-  .worker {
-    background: rgba(243, 189, 114, 0.08);
-    border-color: rgba(243, 189, 114, 0.28);
-  }
-
-  .sync-path {
-    align-items: center;
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .sync-path span {
-    color: rgba(255, 255, 255, 0.55);
-    font-size: 0.65rem;
-    white-space: nowrap;
-  }
-
-  .sync-path i {
-    background: rgba(255, 255, 255, 0.22);
-    display: block;
-    height: 1px;
-    position: relative;
-    width: 100%;
-  }
-
-  .sync-path i::before,
-  .sync-path i::after {
-    border-right: 1px solid rgba(255, 255, 255, 0.4);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    content: '';
-    height: 0.35rem;
-    position: absolute;
-    top: -0.18rem;
-    width: 0.35rem;
-  }
-
-  .sync-path i::before {
-    left: 0;
-    transform: rotate(-135deg);
-  }
-
-  .sync-path i::after {
-    right: 0;
-    transform: rotate(45deg);
-  }
-
-  @media (max-width: 760px) {
-    .crate-visual {
-      gap: 1.25rem;
-      grid-template-columns: 1fr;
-      padding: 1.5rem 1.25rem;
-    }
-
-    .sync-path {
-      min-height: 3rem;
-    }
-
-    .sync-path i {
-      height: 2rem;
-      width: 1px;
-    }
-
-    .sync-path i::before,
-    .sync-path i::after {
-      left: -0.17rem;
-      top: auto;
-    }
-
-    .sync-path i::before {
-      top: 0;
-      transform: rotate(-45deg);
-    }
-
-    .sync-path i::after {
-      bottom: 0;
-      right: auto;
-      transform: rotate(135deg);
-    }
-
-    .storage-row {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>

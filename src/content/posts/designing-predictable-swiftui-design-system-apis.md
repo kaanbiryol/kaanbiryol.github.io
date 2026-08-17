@@ -7,13 +7,13 @@ topics: ['Swift', 'design systems', 'API design']
 
 ## Introduction
 
-A lot of companies publish their design systems and explain concepts like tokens, components, variants, and patterns. They mostly focus on how components should look, behave, and fit together.
+Most writing about design systems focuses on concepts like tokens, components, variants, and patterns, and how those pieces should look, behave, and fit together.
 
 A design system is meant to bring consistency and speed to product development. At the product level, this usually works well. Buttons look like other buttons, spacing follows a shared scale, and colors and typography stay consistent across features.
 
 Developers interact with the design system through code every day. For them, the design system is also an API, and that API is often less consistent than the visual system it represents.
 
-SwiftUI gives us several ways to shape a component API. Configuration can live in an initializer, a `ViewModifier`, a style protocol such as `ButtonStyle`, a static factory method, the environment, or some combination of them.
+SwiftUI gives us several ways to shape a component API. Configuration can live in an initializer, a `ViewModifier`, a style protocol (e.g. `ButtonStyle`), an environment value, or some combination of them.
 
 One component might put all of its configuration in the initializer:
 
@@ -34,39 +34,33 @@ Another might use `ViewModifier`s:
 DSButton("Continue") {
     submit()
 }
+.dsImage(Image(systemName: "arrow.right"))
 .dsSize(.small)
 .dsVariant(.outlined)
-```
-
-Another might expose static factory methods:
-
-```swift
-DSButton.filled("Continue") {
-    submit()
-}
-
-DSButton.outlined("Cancel") {
-    cancel()
-}
 ```
 
 Another might combine the approaches:
 
 ```swift
-DSButton.outlined(
+DSButton(
     "Continue",
-    size: .small
+    image: Image(systemName: "arrow.right")
 ) {
     submit()
 }
-.image(Image(systemName: "arrow.right"))
+.dsSize(.small)
+.dsVariant(.outlined)
 ```
 
 ## The problem
 
+### Predictability
+
 These APIs are not **predictable**.
 
 If I were to show you `DSButton`'s API surface, would you be able to tell how to add an `Image` to the `Chip`? How do you make the text in your `Banner` centered? Some components set their properties via the initializer, while others take it through a `ViewModifier` or perhaps an environment value.
+
+### Discoverability
 
 And how do you handle **discoverability** in these approaches? How do you know what properties are supported and how to use them?
 
@@ -95,7 +89,7 @@ DSButton(
 .dsVariant(.outlined)
 ```
 
-In this example, the initializer describes the component's **content and behavior** (the **what**):
+The initializer describes the component's **content and behavior** (the **what**):
 
 - title
 - optional image
@@ -112,38 +106,45 @@ Together, these two choices produce a small, predictable set of presentations:
 
 ![Six presentations produced by DSButton.Size and DSButton.Variant](./_assets/swiftui-design-system-button-variants-dark.png 'theme-preview-dark')
 
-SwiftUI gives us several ways to implement this API. Before comparing them, let's look at `size`. It affects the button's internal layout, including the spacing between its icon and title. Any approach we choose therefore needs a way to influence that private layout.
+SwiftUI gives us several ways to implement this API. Before comparing them, let's look at `size`. It affects the button's internal layout, including the spacing between its image and title. Any approach we choose therefore needs a way to influence that private layout.
 
 ```swift
-public enum Size {
-    case small
-    case large
+public struct DSButton: View {
+    public enum Size {
+        case small
+        case large
 
-    var contentSpacing: CGFloat {
-        switch self {
-        case .small:
-            Spacing.small
-        case .large:
-            Spacing.medium
+        var contentSpacing: CGFloat {
+            switch self {
+            case .small:
+                Spacing.small
+            case .large:
+                Spacing.medium
+            }
         }
     }
-}
 
+    private var size: Size = .large
 
-public var body: some View {
-    Button(action: action) {
-        HStack(spacing: size.contentSpacing) {
-            if let image {
-                DSImage(image)
+    // Title, image, action, and initializer omitted
+
+    public var body: some View {
+        Button(action: action) {
+            HStack(spacing: size.contentSpacing) {
+                if let image {
+                    DSImage(image)
+                }
+
+                DSLabel(title)
             }
-
-            DSLabel(title)
         }
     }
 }
 ```
 
-## The `ViewModifier`
+## Evaluating the options
+
+### The `ViewModifier`
 
 `ViewModifier` looks like the obvious choice. It gives us familiar dot syntax and is designed for reusable view transformations.
 
@@ -163,9 +164,9 @@ extension View {
 }
 ```
 
-The `ViewModifier` receives an opaque `content` parameter, which it can use to wrap the button as a whole. However, it has no access to the private `HStack` where `contentSpacing` must be applied.
+The problem is that the `ViewModifier` only gets the button as `opaque` content. It can wrap the button as a whole, but it cannot reach into the private `HStack` where we actually need to change the spacing.
 
-### `ViewModifier` Scope and Discoverability
+#### `ViewModifier` scope and discoverability
 
 Another issue is scope. Custom modifiers are often exposed through extensions on `View`, which makes them available even on views where they have no meaningful effect.
 
@@ -191,7 +192,11 @@ Why does a `Button` offer a `textFieldStyle` modifier even though it does not co
 
 Protocols can narrow this API surface to the components you own, but they do not change the underlying boundary: a `ViewModifier` still cannot inspect private component state or configure internal layout.
 
-## `ButtonStyle`
+### View styles
+
+Styles separate a view's configuration from its presentation. We can use a style protocol provided by SwiftUI or define one specifically for our design system.
+
+#### `ButtonStyle`
 
 Since the component is a button, `ButtonStyle` is another option. SwiftUI uses it to switch between built-in button presentations:
 
@@ -212,9 +217,9 @@ struct PressFeedbackStyle: ButtonStyle {
 }
 ```
 
-This is exactly what `ButtonStyle` is good at. The limitation is that [`ButtonStyle.Configuration`](https://developer.apple.com/documentation/swiftui/buttonstyleconfiguration) exposes the label as an opaque view, along with state known by SwiftUI such as `isPressed` and `role`. It does not expose the label's internal `HStack`, icon, or text as independently configurable views, which is the access we need to change `contentSpacing`.
+This is exactly what `ButtonStyle` is good at. The limitation is that [`ButtonStyle.Configuration`](https://developer.apple.com/documentation/swiftui/buttonstyleconfiguration) exposes the label as an opaque view, along with state known by SwiftUI such as `isPressed` and `role`. It does not expose the `HStack` that makes up that label, or the `DSImage` and `DSLabel` inside it, as independently configurable views, which is the access we need to change `contentSpacing`.
 
-## Custom styles
+#### Custom styles
 
 Another option is to define our own configuration and style protocol, similar to SwiftUI's `ButtonStyle`:
 
@@ -254,13 +259,11 @@ struct DefaultDSButtonStyle: DSButtonStyle {
 }
 ```
 
-Custom styles make more sense when we want to support very different versions of the same component. For example, a regular button, an icon-only button, and a floating action button could have completely different layouts while still representing the same kind of action.
+Custom styles make more sense when we want to support very different versions of the same component. A style receives the component’s semantic configuration and builds its presentation, so it can change the entire view hierarchy rather than only values such as spacing or color. For example, a regular button, an icon-only button, and a floating action button could have completely different layouts while still representing the same kind of action.
 
 That's not really what we need here. `size` and `variant` are just a few supported ways to configure `DSButton`. We don't want callers to replace how the button is built. We only want them to choose between the options the component already supports.
 
-A custom style would give us more flexibility than we actually need.
-
-## Environment values
+### Environment values
 
 The environment is another way to make configuration available inside a component. It works well when the value is meant to cascade through a hierarchy. SwiftUI uses it for things such as locale, layout direction, tint, control size, and styles.
 
@@ -272,7 +275,21 @@ VStack {
 .buttonStyle(.borderedProminent)
 ```
 
-That same behavior makes the environment risky for local presentation choices:
+We could use the same mechanism to make `size` available inside `DSButton`:
+
+```swift
+extension EnvironmentValues {
+    @Entry var dsButtonSize: DSButton.Size = .large
+}
+
+public struct DSButton: View {
+    @Environment(\.dsButtonSize) private var size
+
+    // The body uses size for its internal layout
+}
+```
+
+The downside of this approach is that local reasoning is lost when the environment value is set at a higher level.
 
 ```swift
 VStack {
@@ -285,9 +302,9 @@ VStack {
 .environment(\.dsButtonSize, .large)
 ```
 
-Every descendant that reads `dsButtonSize` now inherits `.large`, including buttons buried inside `DetailsView`. Sometimes that is exactly what we want. But in general, this is a loss of local reasoning. Looking at the button's call site is no longer enough to understand its configuration; you may need to walk up the view hierarchy to find the environment value that affected it.
+Every descendant that reads `dsButtonSize` now inherits `.large`, including buttons buried inside `DetailsView`. Sometimes that is exactly what we want, but looking at the button's call site is no longer enough to understand its configuration. You may need to walk up the view hierarchy to find where the value came from.
 
-However, themes are a good fit for this model because they apply across many components. Instead of passing the current theme into every initializer, we can set it once at the boundary where it applies:
+However, things like `Theme`s are a good fit for this model because they apply across many components. Instead of passing the current theme into every initializer, we can set it once at the boundary where it applies:
 
 ```swift
 DetailsView()
@@ -300,11 +317,11 @@ Components inside that view can read the theme directly:
 public struct DSButton: View {
     @Environment(\.dsTheme) private var theme
 
-    // Use theme for colors
+    // Read colors from the theme property
 }
 ```
 
-Since the environment passes the theme to every descendant automatically, a design system component does not need a `theme` parameter at every call site. This is useful because the theme is contextual. It describes how an entire part of the user interface should look, rather than a local choice made for one component.
+This is where the environment fits much better. A `theme` usually applies to an entire part of the UI, so passing it into every component individually would just be noise.
 
 I reserve environment values for configuration that really is contextual or inherited:
 
@@ -333,20 +350,20 @@ public struct DSButton: View {
         }
     }
 
-    // This has no effect in this implementation, just an example
+    // For the sake of example, this has no effect in this implementation
     public enum Variant {
         case filled
         case outlined
         case plain
     }
 
-    // MARK: - What the component is
+    // MARK: - Content and behavior (the what)
 
     private let title: String
     private let image: Image?
     private let action: () -> Void
 
-    // MARK: - Presentation of the component
+    // MARK: - Presentation configuration (the how)
 
     private var size: Size = .large
     private var variant: Variant = .filled
@@ -376,7 +393,7 @@ public struct DSButton: View {
     // MARK: - Private helpers
     // ...
 
-    // MARK: - Copy-and-return functions
+    // MARK: - Copy-and-return methods
 
     public func dsSize(_ size: Size) -> Self {
         var copy = self
@@ -404,38 +421,33 @@ DSButton("Continue") {
 .frame(maxWidth: .infinity)
 ```
 
-> These methods are intentionally non-mutating. A mutating method cannot be called on the temporary value produced by DSButton(...), while copying and returning Self gives us the chainable value-transforming API we want.
+> These methods are intentionally non-mutating. A mutating method cannot be called on the temporary value produced by `DSButton(...)`, while copying and returning Self gives us the chainable API we want.
 
-## Discoverability
+### Predictability
 
-Prefixing design system methods with `.ds` helps discoverability by narrowing autocomplete to the design system options. Without the prefix, names such as `.size` and `.variant` appear beside a large number of unrelated SwiftUI modifiers.
+This is where the predictability starts to pay off. If the same rule is used across components, you already have a good idea where to look: content and behavior go in the initializer, while presentation lives in component-specific methods.
 
-By keeping the `.ds` prefix, typing those characters narrows autocomplete to the design system options available for that component:
+So when you ask the same questions again:
 
-```swift
-DSButton("Save") {
-    save()
-}
-.dsSize(.small)
-.dsVariant(.outlined)
-```
+> ...how to add an `Image` to the `Chip`?
+
+> How do you make the text in your `Banner` centered?
+
+You are probably thinking that you need to pass `Image` as an argument to the `Chip` initializer, or use something like a `dsTextAlignment(.center)` to center the text in the `Banner`.
+
+### Discoverability
+
+Prefixing design system methods with `.ds` also helps discoverability. Typing `.ds` narrows autocomplete to the options supported by the design system instead of mixing them with unrelated SwiftUI modifiers.
+
+![Autocomplete mock comparing the full SwiftUI modifier list with dsSize and dsVariant suggestions](./_assets/swiftui-design-system-autocomplete-light.svg 'theme-preview-light')
+
+![Autocomplete mock comparing the full SwiftUI modifier list with dsSize and dsVariant suggestions](./_assets/swiftui-design-system-autocomplete-dark.svg 'theme-preview-dark')
 
 ## A practical rule of thumb
 
-These patterns are not competing solutions to the same problem. They operate at different layers and are often most useful together.
-
-For a typical design system button, that can mean using several mechanisms together:
-
-- a native `Button` for behavior and accessibility
-- copy-and-return methods for component-specific choices such as `size` and `variant`
-- an internal `ButtonStyle` for interaction states such as `isPressed`
-- environment values for contextual values such as themes
-
-The goal is not to pick one abstraction and use it everywhere. It is to put each decision in the layer that already has the information needed to make it.
-
 The pattern I now use for components is:
 
-**The initializer describes what the component is.** Required content and behavior belong here:
+The initializer describes **what the component is.** Required content and behavior belong here:
 
 ```swift
 DSButton(
@@ -445,14 +457,14 @@ DSButton(
 )
 ```
 
-**Component-specific methods describe the supported presentation.** These are presentation choices owned by the component:
+Component-specific methods **describe the how.** These are presentation choices owned by the component:
 
 ```swift
 .dsSize(.small)
 .dsVariant(.outlined)
 ```
 
-**Generic SwiftUI modifiers stay generic.**
+Generic **SwiftUI modifiers stay generic.**
 
 ```swift
 .frame(maxWidth: .infinity)
@@ -462,19 +474,19 @@ DSButton(
 
 ### Choosing the right approach
 
-| Approach               | Best Used When                                                                                                |
-| ---------------------- | ------------------------------------------------------------------------------------------------------------- |
-| **Initializer**        | Required content and behavior that define what the component is                                               |
-| **ViewModifier**       | Transformations that do not need direct access to component-owned state or internal layout                    |
-| **ButtonStyle**        | Styling the button's content and reacting to state such as `isPressed`                                        |
-| **Custom Style**       | Supporting substantially different implementations of the same component                                      |
-| **Copy-and-return**    | Closed, component-specific presentation choices, especially when they affect private state or internal layout |
-| **Environment Values** | Contextual values, such as themes, that should be inherited by descendants                                    |
+| Approach                    | Best Used When                                                                                                                                       |
+| --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Initializer**             | Required content and behavior that define what the component is                                                                                      |
+| **ViewModifier**            | General transformations that do not need direct access to component-owned state or internal layout (e.g. applying a `shadow` to the whole component) |
+| **ButtonStyle**             | Reacting to state such as `isPressed`                                                                                                                |
+| **Custom Style**            | Supporting substantially different implementations of the same component                                                                             |
+| **Copy-and-return methods** | Closed, component-specific presentation choices, especially when they affect private state or internal layout                                        |
+| **Environment Values**      | Contextual values, such as themes, that should be inherited by descendants                                                                           |
 
 ## Conclusion
 
 There are other ways to configure SwiftUI components (see [1](https://movingparts.io/styling-components-in-swiftui#dynamic-property), [2](https://hop.ie/blog/design-system-swift/)), each with different tradeoffs around type safety, scope, and implementation complexity. In this case, copy-and-return methods gave me the simplest way to keep component-specific configuration local while leaving internal layout decisions inside the component.
 
-Predictability does not come from forcing every configuration option through the same SwiftUI mechanism. It comes from giving each decision a consistent place: content and behavior in the initializer, component-owned presentation in component-specific methods, interaction state in styles, and inherited context in the environment.
+Predictability does not come from forcing every configuration option through the same SwiftUI mechanism. It comes from giving each decision a consistent place: content and behavior in the initializer, component-owned presentation in component-specific methods, interaction states in styles, and inherited context in the environment.
 
 Once that boundary is consistent across the design system, learning one component helps you understand the next. The API becomes easier to discover, harder to misuse, and as consistent in code as the design system is on screen.

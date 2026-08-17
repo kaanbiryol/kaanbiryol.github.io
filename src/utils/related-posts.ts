@@ -19,6 +19,7 @@ export function getRelatedPosts(
       return {
         id: post.id,
         title: post.data.title,
+        description: post.data.description,
         pubDate: post.data.pubDate,
         sharedTopics
       }

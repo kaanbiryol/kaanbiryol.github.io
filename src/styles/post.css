@@ -15,6 +15,16 @@
   margin-top: 0;
 }
 
+/* Give the article a quiet but unambiguous ending before recommendations. */
+.prose .content::after {
+  background: var(--text-tertiary);
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 3.25rem auto 0;
+  width: 1.5rem;
+}
+
 /* Post title section */
 .prose .title {
   margin-bottom: 1em;

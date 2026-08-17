@@ -28,6 +28,7 @@ export interface AdjacentPost {
 }
 
 export interface RelatedPost extends AdjacentPost {
+  description: string
   pubDate: Date
   sharedTopics: string[]
 }

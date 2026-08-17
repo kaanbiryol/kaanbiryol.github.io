@@ -7,6 +7,7 @@ import { themeConfig } from '../config.ts'
  * - Adds data-preview attribute for image viewer functionality
  * - Adds lazy loading for better performance
  * - Handles multiple images in a single paragraph
+ * - Marks light and dark previews from reserved image title metadata
  */
 export default function rehypeImageProcessor() {
   return (tree) => {
@@ -37,6 +38,17 @@ export default function rehypeImageProcessor() {
 
       for (const imgNode of imgNodes) {
         const alt = imgNode.properties?.alt?.trim()
+        const themePreview = imgNode.properties?.title
+        const themePreviewClass =
+          themePreview === 'theme-preview-light'
+            ? 'theme-preview-light'
+            : themePreview === 'theme-preview-dark'
+              ? 'theme-preview-dark'
+              : null
+
+        if (themePreviewClass) {
+          delete imgNode.properties.title
+        }
 
         // Enhanced image properties with performance optimizations
         imgNode.properties = {
@@ -60,7 +72,7 @@ export default function rehypeImageProcessor() {
           type: 'element',
           tagName: 'figure',
           properties: {
-            className: ['image-caption-wrapper']
+            className: ['image-caption-wrapper', ...(themePreviewClass ? [themePreviewClass] : [])]
           },
           children: [
             imgNode,

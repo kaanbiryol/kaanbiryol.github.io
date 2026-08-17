@@ -321,6 +321,11 @@
   text-align: center;
 }
 
+html:not(.dark) .prose .theme-preview-dark,
+html.dark .prose .theme-preview-light {
+  display: none;
+}
+
 .prose p > img {
   position: relative;
   margin-bottom: 2em;

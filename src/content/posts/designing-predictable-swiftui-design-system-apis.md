@@ -421,7 +421,7 @@ DSButton("Continue") {
 .frame(maxWidth: .infinity)
 ```
 
-> These methods are intentionally non-mutating. A mutating method cannot be called on the temporary value produced by `DSButton(...)`, while copying and returning Self gives us the chainable API we want.
+> These methods return a modified copy instead of changing the original value. Swift does not allow a mutating method on the temporary value created by `DSButton(...)`, so returning `Self` is what keeps the API chainable.
 
 ### Predictability
 
@@ -478,15 +478,13 @@ Generic **SwiftUI modifiers stay generic.**
 | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Initializer**             | Required content and behavior that define what the component is                                                                                      |
 | **ViewModifier**            | General transformations that do not need direct access to component-owned state or internal layout (e.g. applying a `shadow` to the whole component) |
-| **ButtonStyle**             | Reacting to state such as `isPressed`                                                                                                                |
+| **(Button/Toggle...)Style** | Reacting to state such as `isPressed`                                                                                                                |
 | **Custom Style**            | Supporting substantially different implementations of the same component                                                                             |
 | **Copy-and-return methods** | Closed, component-specific presentation choices, especially when they affect private state or internal layout                                        |
 | **Environment Values**      | Contextual values, such as themes, that should be inherited by descendants                                                                           |
 
 ## Conclusion
 
-There are other ways to configure SwiftUI components (see [1](https://movingparts.io/styling-components-in-swiftui#dynamic-property), [2](https://hop.ie/blog/design-system-swift/)), each with different tradeoffs around type safety, scope, and implementation complexity. In this case, copy-and-return methods gave me the simplest way to keep component-specific configuration local while leaving internal layout decisions inside the component.
+SwiftUI gives us several ways to solve this problem (see [1](https://movingparts.io/styling-components-in-swiftui#dynamic-property), [2](https://hop.ie/blog/design-system-swift/)). Each comes with a different tradeoff.
 
-Predictability does not come from forcing every configuration option through the same SwiftUI mechanism. It comes from giving each decision a consistent place: content and behavior in the initializer, component-owned presentation in component-specific methods, interaction states in styles, and inherited context in the environment.
-
-Once that boundary is consistent across the design system, learning one component helps you understand the next. The API becomes easier to discover, harder to misuse, and as consistent in code as the design system is on screen.
+What matters most is knowing where each decision belongs. When those rules hold across the design system, each new component feels familiar. Learn one and you can usually predict how the next will work. The result is an API that is easy to discover, difficult to misuse, and consistent with what appears on screen.

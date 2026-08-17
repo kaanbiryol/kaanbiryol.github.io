@@ -86,7 +86,9 @@ const tools = [
   }
 ]
 
-const visibleTools = isFull ? tools : tools.slice(0, 3)
+const visibleTools = isFull
+  ? tools
+  : [...tools].sort((first, second) => second.pushedAt.localeCompare(first.pushedAt)).slice(0, 3)
 ---
 
 <section class:list={['work-section', isFull ? 'work-page' : 'work-summary']} aria-labelledby={headingId}>

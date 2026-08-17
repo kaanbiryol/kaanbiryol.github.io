@@ -41,7 +41,8 @@ const iosApps = [
 const tools = [
   {
     name: 'harbor',
-    href: 'https://github.com/kaanbiryol/harbor',
+    sourceHref: 'https://github.com/kaanbiryol/harbor',
+    detailHref: '/work/harbor/',
     description:
       'Native Rust app for GitHub pull request workflows, review threads, checks, logs, and local worktrees.',
     language: 'Rust',
@@ -50,7 +51,8 @@ const tools = [
   },
   {
     name: 'swift_unused_deps',
-    href: 'https://github.com/kaanbiryol/swift_unused_deps',
+    sourceHref: 'https://github.com/kaanbiryol/swift_unused_deps',
+    detailHref: '/work/swift-unused-deps/',
     description: 'Detect unused and missing direct Bazel dependencies for Swift targets.',
     language: 'Swift',
     languageColor: '#f05138',
@@ -58,7 +60,8 @@ const tools = [
   },
   {
     name: 'obsidian-crate',
-    href: 'https://github.com/kaanbiryol/obsidian-crate',
+    sourceHref: 'https://github.com/kaanbiryol/obsidian-crate',
+    detailHref: '/work/obsidian-crate/',
     description:
       'Self-hosted Obsidian vault sync and reminders using Cloudflare R2, Workers, D1, and push notifications.',
     language: 'TypeScript',
@@ -67,7 +70,8 @@ const tools = [
   },
   {
     name: 'init-revise-cli',
-    href: 'https://github.com/kaanbiryol/init-revise-cli',
+    sourceHref: 'https://github.com/kaanbiryol/init-revise-cli',
+    detailHref: '/work/init-revise-cli/',
     description: 'Swift CLI that rewrites type-inferred initializations to explicit ones using SwiftSyntax.',
     language: 'Swift',
     languageColor: '#f05138',
@@ -75,7 +79,8 @@ const tools = [
   },
   {
     name: 'tuist-to-bazel',
-    href: 'https://github.com/kaanbiryol/tuist-to-bazel',
+    sourceHref: 'https://github.com/kaanbiryol/tuist-to-bazel',
+    detailHref: '/work/tuist-to-bazel/',
     description: 'Generate Bazel BUILD files from a Tuist project graph.',
     language: 'Swift',
     languageColor: '#f05138',
@@ -111,10 +116,19 @@ const visibleTools = isFull ? tools : tools.slice(0, 3)
           <article class="project-item">
             <div class="project-header">
               <h3>
-                <a href={project.href} target="_blank" rel="noopener noreferrer">
+                <a
+                  href={project.detailHref ?? project.sourceHref}
+                  target={project.detailHref ? undefined : '_blank'}
+                  rel={project.detailHref ? undefined : 'noopener noreferrer'}
+                >
                   {project.name}
                 </a>
               </h3>
+              {project.detailHref && (
+                <a class="source-link" href={project.sourceHref} target="_blank" rel="noopener noreferrer">
+                  GitHub ↗
+                </a>
+              )}
             </div>
             <p class="description">{project.description}</p>
             <p class="project-meta">
@@ -270,6 +284,19 @@ const visibleTools = isFull ? tools : tools.slice(0, 3)
 
   h3 a:hover {
     color: var(--text-secondary);
+  }
+
+  .source-link {
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    text-decoration: none;
+    transition: color 0.2s ease-out;
+  }
+
+  .source-link:hover {
+    color: var(--text-primary);
   }
 
   .description {

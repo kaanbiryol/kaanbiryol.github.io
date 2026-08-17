@@ -1,0 +1,199 @@
+---
+import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
+
+const description = 'A Swift command-line tool that converts a Tuist project graph into inspectable Bazel files.'
+---
+
+<WorkProjectLayout
+  title="tuist-to-bazel"
+  {description}
+  eyebrow="Open source · iOS build systems"
+  sourceHref="https://github.com/kaanbiryol/tuist-to-bazel"
+  visualCaption="The converter turns Tuist’s exported graph into ordinary Bazel files and generated support sources."
+  facts={[
+    { label: 'Input', value: 'Tuist graph JSON' },
+    { label: 'Built with', value: 'Swift · Bazel' },
+    { label: 'Output', value: 'MODULE · BUILD files' }
+  ]}
+>
+  <div slot="visual" class="conversion-visual" aria-label="Tuist graph to Bazel file conversion">
+    <div class="source-panel">
+      <span class="panel-label">Project graph</span>
+      <strong>graph.json</strong>
+      <pre><code>&#123;
+  <i>"projects"</i>: &#123; ... &#125;,
+  <i>"targets"</i>: [ ... ],
+  <i>"dependencies"</i>: [ ... ]
+&#125;</code></pre>
+    </div>
+    <div class="conversion-step">
+      <code>tuist-to-bazel convert</code>
+      <i aria-hidden="true"></i>
+    </div>
+    <div class="output-panel">
+      <span class="panel-label">Generated output</span>
+      <ul>
+        <li><span>MODULE.bazel</span><em>module dependencies</em></li>
+        <li><span>BUILD.bazel</span><em>root project</em></li>
+        <li><span>App/BUILD.bazel</span><em>targets and resources</em></li>
+        <li><span>.bazel/Generated</span><em>support sources</em></li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>A migration artifact you can inspect and evolve</h2>
+  <p>
+    tuist-to-bazel reads the JSON emitted by <code>tuist graph</code> through narrow local data types, then generates a Bazel
+    module, per-package BUILD files, and the support sources needed by the converted project.
+  </p>
+  <p>
+    The result is ordinary Bazel configuration rather than a hidden compatibility layer. It can be reviewed, edited,
+    queried, and built directly while a team moves its iOS project toward Bazel.
+  </p>
+</WorkProjectLayout>
+
+<style>
+  .conversion-visual {
+    align-items: center;
+    color: rgba(255, 255, 255, 0.88);
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: minmax(15rem, 1fr) 10rem minmax(15rem, 1fr);
+    min-height: 31rem;
+    padding: 3rem;
+  }
+
+  .source-panel,
+  .output-panel {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.11);
+    border-radius: 0.5rem;
+    min-height: 16rem;
+    padding: 1.5rem;
+  }
+
+  .panel-label {
+    color: rgba(255, 255, 255, 0.55);
+    display: block;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 0.75rem;
+    text-transform: uppercase;
+  }
+
+  .source-panel strong {
+    font-family: var(--mono);
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  pre {
+    margin: 1.25rem 0 0;
+    overflow: auto;
+  }
+
+  pre code {
+    color: rgba(255, 255, 255, 0.55);
+    font-family: var(--mono);
+    font-size: 0.72rem;
+    line-height: 1.9;
+  }
+
+  pre i {
+    color: #a8c7fa;
+    font-style: normal;
+  }
+
+  .conversion-step {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .conversion-step code {
+    color: #f3bd72;
+    font-family: var(--mono);
+    font-size: 0.68rem;
+    text-align: center;
+  }
+
+  .conversion-step i {
+    background: rgba(255, 255, 255, 0.22);
+    display: block;
+    height: 1px;
+    position: relative;
+    width: 100%;
+  }
+
+  .conversion-step i::after {
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    border-top: 1px solid rgba(255, 255, 255, 0.4);
+    content: '';
+    height: 0.4rem;
+    position: absolute;
+    right: 0;
+    top: -0.2rem;
+    transform: rotate(45deg);
+    width: 0.4rem;
+  }
+
+  .output-panel ul {
+    list-style: none;
+    margin: 1rem 0 0;
+    padding: 0;
+  }
+
+  .output-panel li {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    padding: 0.7rem 0;
+  }
+
+  .output-panel li span {
+    font-family: var(--mono);
+    font-size: 0.72rem;
+  }
+
+  .output-panel li em {
+    color: rgba(255, 255, 255, 0.55);
+    font-size: 0.68rem;
+    font-style: normal;
+    margin-top: 0.15rem;
+  }
+
+  p code {
+    background: var(--code-bg);
+    border-radius: 0.2rem;
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 0.82em;
+    padding: 0.12em 0.3em;
+  }
+
+  @media (max-width: 760px) {
+    .conversion-visual {
+      gap: 1.25rem;
+      grid-template-columns: 1fr;
+      padding: 1.5rem 1.25rem;
+    }
+
+    .source-panel,
+    .output-panel {
+      min-height: 0;
+    }
+
+    .conversion-step i {
+      height: 2.5rem;
+      width: 1px;
+    }
+
+    .conversion-step i::after {
+      bottom: 0;
+      right: -0.2rem;
+      top: auto;
+      transform: rotate(135deg);
+    }
+  }
+</style>

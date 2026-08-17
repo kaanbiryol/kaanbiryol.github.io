@@ -28,6 +28,46 @@ test('core pages load with their primary content', async ({ page }) => {
   await expect(page.getByText(/^\d+ posts$/)).toBeVisible()
 })
 
+test('work links to each project showcase', async ({ page }) => {
+  const projects = [
+    { link: 'harbor', path: 'harbor', heading: 'Harbor' },
+    { link: 'swift_unused_deps', path: 'swift-unused-deps', heading: 'swift_unused_deps' },
+    { link: 'obsidian-crate', path: 'obsidian-crate', heading: 'Crate' },
+    { link: 'init-revise-cli', path: 'init-revise-cli', heading: 'init-revise-cli' },
+    { link: 'tuist-to-bazel', path: 'tuist-to-bazel', heading: 'tuist-to-bazel' }
+  ]
+
+  for (const project of projects) {
+    await page.goto('/work/')
+    await page.getByRole('link', { name: project.link, exact: true }).click()
+
+    await expect(page).toHaveURL(new RegExp(`/work/${project.path}/$`))
+    await expect(page.getByRole('heading', { level: 1, name: project.heading })).toBeVisible()
+    await expect(page.getByRole('figure')).toBeVisible()
+    await expect(page.getByRole('link', { name: 'Work', exact: true })).toHaveAttribute('aria-current', 'location')
+
+    const pageWidth = await page.evaluate(() => ({
+      content: document.documentElement.scrollWidth,
+      viewport: innerWidth
+    }))
+    expect(pageWidth.content).toBeLessThanOrEqual(pageWidth.viewport)
+  }
+})
+
+test('swift_unused_deps tells the check, fix, and verification story', async ({ page }) => {
+  await page.goto('/work/swift-unused-deps/')
+
+  await expect(page.getByLabel('swift_unused_deps check, fix, and verification demo')).toContainText(
+    'MISSING_DIRECT_DEP'
+  )
+  await expect(page.getByLabel('swift_unused_deps check, fix, and verification demo')).toContainText('0 issues found.')
+  await expect(page.getByRole('link', { name: 'Setup ↗' })).toHaveAttribute(
+    'href',
+    'https://github.com/kaanbiryol/swift_unused_deps#setup'
+  )
+  await expect(page.getByRole('heading', { level: 3, name: 'What it catches' })).toBeVisible()
+})
+
 test('article charts and controls initialize', async ({ page }, testInfo) => {
   await page.goto(chartArticle)
 

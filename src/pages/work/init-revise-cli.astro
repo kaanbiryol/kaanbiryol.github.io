@@ -1,0 +1,163 @@
+---
+import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
+
+const description = 'A Swift CLI that replaces inferred initializers with explicit types resolved through SourceKit.'
+---
+
+<WorkProjectLayout
+  title="init-revise-cli"
+  {description}
+  eyebrow="Open source · Swift compiler tooling"
+  sourceHref="https://github.com/kaanbiryol/init-revise-cli"
+  visualCaption="SourceKit resolves each inferred type before SwiftSyntax rewrites the source in place."
+  facts={[
+    { label: 'Platform', value: 'Swift toolchain' },
+    { label: 'Built with', value: 'SourceKit · SwiftSyntax' },
+    { label: 'Transformation', value: '.init → explicit type' }
+  ]}
+>
+  <div slot="visual" class="code-visual" aria-label="Before and after Swift initializer transformation">
+    <div class="code-bar">
+      <span class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>Example.swift</span>
+    </div>
+    <div class="code-columns">
+      <div class="code-column before">
+        <span class="column-label">Before</span>
+        <pre><code><span>doSomething(</span>
+  model: <mark>.init</mark>(value: <i>"1"</i>)
+)
+
+models = [
+  <mark>.init</mark>(value: <i>"2"</i>),
+  <mark>.init</mark>(value: <i>"3"</i>)
+]</code></pre>
+      </div>
+      <div class="code-column after">
+        <span class="column-label">After</span>
+        <pre><code><span>doSomething(</span>
+  model: <mark>Test.ViewModel</mark>(value: <i>"1"</i>)
+)
+
+models = [
+  <mark>Test.ViewModel</mark>(value: <i>"2"</i>),
+  <mark>Test.ViewModel</mark>(value: <i>"3"</i>)
+]</code></pre>
+      </div>
+    </div>
+  </div>
+
+  <h2>Give the type checker a direct path</h2>
+  <p>
+    In complex Swift expressions, implicit <code>.init(...)</code> calls can leave more work for the type checker. init-revise-cli
+    asks SourceKit for the resolved expression type and replaces the shorthand with its fully qualified initializer.
+  </p>
+  <p>
+    SwiftSyntax performs the source transformation while preserving the surrounding code. The tool handles optionals,
+    arrays, and nested types, and can process an Xcode project using per-file compiler arguments.
+  </p>
+</WorkProjectLayout>
+
+<style>
+  .code-visual {
+    color: rgba(255, 255, 255, 0.88);
+    font-family: var(--mono);
+  }
+
+  .code-bar {
+    align-items: center;
+    background: #11151b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+    display: grid;
+    font-size: 0.75rem;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0.85rem 1rem;
+  }
+
+  .traffic-lights {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .traffic-lights i {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: block;
+    height: 0.6rem;
+    width: 0.6rem;
+  }
+
+  .code-columns {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    min-height: 31rem;
+  }
+
+  .code-column {
+    min-width: 0;
+    padding: 2.25rem 2.5rem 2.75rem;
+  }
+
+  .code-column + .code-column {
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .column-label {
+    color: rgba(255, 255, 255, 0.55);
+    display: block;
+    font-family: var(--sans);
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+  }
+
+  pre {
+    margin: 0;
+    overflow: auto;
+  }
+
+  pre code {
+    font-size: 0.78rem;
+    line-height: 1.9;
+  }
+
+  pre mark {
+    background: transparent;
+    color: #f3bd72;
+  }
+
+  .after pre mark {
+    color: #8bd49c;
+  }
+
+  pre i {
+    color: #a8c7fa;
+    font-style: normal;
+  }
+
+  p code {
+    background: var(--code-bg);
+    border-radius: 0.2rem;
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 0.82em;
+    padding: 0.12em 0.3em;
+  }
+
+  @media (max-width: 620px) {
+    .code-columns {
+      grid-template-columns: 1fr;
+    }
+
+    .code-column {
+      padding: 1.5rem 1.25rem 1.75rem;
+    }
+
+    .code-column + .code-column {
+      border-left: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  }
+</style>

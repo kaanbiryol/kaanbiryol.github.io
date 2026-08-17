@@ -1,0 +1,250 @@
+---
+import IndexLayout from '@/layouts/IndexLayout.astro'
+import { themeConfig } from '@/config'
+
+interface ProjectFact {
+  label: string
+  value: string
+}
+
+interface Props {
+  title: string
+  description: string
+  eyebrow: string
+  sourceHref: string
+  secondaryHref?: string
+  secondaryLabel?: string
+  visualCaption: string
+  facts: ProjectFact[]
+}
+
+const { title, description, eyebrow, sourceHref, secondaryHref, secondaryLabel, visualCaption, facts } =
+  Astro.props as Props
+---
+
+<IndexLayout title={`${title} · ${themeConfig.site.title}`} description={description}>
+  <article class="project-page">
+    <a class="back-link" href="/work/" aria-label="Back to all work">← All work</a>
+
+    <header class="project-intro">
+      <p class="eyebrow">{eyebrow}</p>
+      <div class="title-row">
+        <h1>{title}</h1>
+        <div class="title-actions">
+          <a href={sourceHref} target="_blank" rel="noopener noreferrer">GitHub ↗</a>
+          {
+            secondaryHref && secondaryLabel && (
+              <a href={secondaryHref} target="_blank" rel="noopener noreferrer">
+                {secondaryLabel} ↗
+              </a>
+            )
+          }
+        </div>
+      </div>
+      <p class="lead">{description}</p>
+    </header>
+
+    <figure class="project-visual">
+      <div class="visual-frame">
+        <slot name="visual" />
+      </div>
+      <figcaption>{visualCaption}</figcaption>
+    </figure>
+
+    <section class="project-copy" aria-label={`${title} overview`}>
+      <slot />
+    </section>
+
+    <dl class="project-facts" aria-label="Project details">
+      {
+        facts.map((fact) => (
+          <div>
+            <dt>{fact.label}</dt>
+            <dd>{fact.value}</dd>
+          </div>
+        ))
+      }
+    </dl>
+  </article>
+</IndexLayout>
+
+<style>
+  .project-page {
+    margin-top: 1.25rem;
+  }
+
+  .back-link {
+    color: var(--text-secondary);
+    display: inline-block;
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    margin-bottom: 2.25rem;
+    text-decoration: none;
+    transition: color 0.2s ease-out;
+  }
+
+  .back-link:hover {
+    color: var(--text-primary);
+  }
+
+  .project-intro {
+    max-width: 32rem;
+  }
+
+  .eyebrow {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    margin: 0 0 0.4rem;
+  }
+
+  .title-row {
+    align-items: baseline;
+    display: flex;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+
+  h1 {
+    font-size: 1.75rem;
+    font-weight: var(--font-weight-bold);
+    letter-spacing: -0.04em;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .title-actions {
+    display: flex;
+    flex-shrink: 0;
+    gap: 0.8rem;
+  }
+
+  .title-actions a {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.5;
+    text-decoration: none;
+    transition: color 0.2s ease-out;
+  }
+
+  .title-actions a:hover {
+    color: var(--text-primary);
+  }
+
+  .lead {
+    color: var(--text-secondary);
+    font-size: var(--font-size-l);
+    line-height: 1.7;
+    margin: 0.65rem 0 0;
+  }
+
+  .project-visual {
+    margin: 2.75rem 50% 0;
+    transform: translateX(-50%);
+    width: min(64rem, calc(100vw - 3rem));
+  }
+
+  .visual-frame {
+    background: #07090c;
+    border: 1px solid var(--border);
+    border-radius: 0.75rem;
+    box-shadow: 0 1.25rem 3rem rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+  }
+
+  figcaption {
+    color: var(--text-secondary);
+    font-size: var(--font-size-s);
+    line-height: 1.6;
+    margin: 0.65rem auto 0;
+    max-width: 35rem;
+  }
+
+  .project-copy {
+    margin-top: 3rem;
+  }
+
+  .project-copy :global(h2) {
+    font-size: 1rem;
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 0 0 0.5rem;
+  }
+
+  .project-copy :global(p) {
+    color: var(--text-secondary);
+    line-height: 1.75;
+    margin: 0.85rem 0 0;
+  }
+
+  .project-facts {
+    border-bottom: 1px solid var(--border);
+    border-top: 1px solid var(--border);
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    margin: 2.25rem 0 0;
+    padding: 1rem 0;
+  }
+
+  .project-facts div {
+    min-width: 0;
+  }
+
+  .project-facts dt,
+  .project-facts dd {
+    font-size: var(--font-size-s);
+    line-height: 1.55;
+    margin: 0;
+  }
+
+  .project-facts dt {
+    color: var(--text-secondary);
+  }
+
+  .project-facts dd {
+    color: var(--text-primary);
+    margin-top: 0.15rem;
+  }
+
+  @media (max-width: 620px) {
+    .project-page {
+      margin-top: 1rem;
+    }
+
+    .back-link {
+      margin-bottom: 1.75rem;
+    }
+
+    .project-visual {
+      margin-top: 2.25rem;
+      width: calc(100vw - 1.5rem);
+    }
+
+    .visual-frame {
+      border-radius: 0.5rem;
+      box-shadow: 0 0.75rem 2rem rgba(0, 0, 0, 0.1);
+    }
+
+    figcaption {
+      padding: 0 0.6rem;
+    }
+
+    .project-copy {
+      margin-top: 2.5rem;
+    }
+  }
+
+  @media (max-width: 420px) {
+    .title-row {
+      align-items: flex-start;
+    }
+
+    .title-actions {
+      align-items: flex-end;
+      flex-direction: column;
+      gap: 0.2rem;
+      padding-top: 0.35rem;
+    }
+  }
+</style>

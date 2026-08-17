@@ -1,0 +1,47 @@
+---
+import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
+
+const description =
+  'A native workspace for reviewing GitHub pull requests, following checks and logs, and managing local worktrees.'
+---
+
+<WorkProjectLayout
+  title="Harbor"
+  {description}
+  eyebrow="Open source · macOS"
+  sourceHref="https://github.com/kaanbiryol/harbor"
+  visualCaption="Reviewing a pull request and its unresolved inline discussion in Harbor."
+  facts={[
+    { label: 'Platform', value: 'macOS' },
+    { label: 'Built with', value: 'Rust · GPUI' },
+    { label: 'Status', value: 'Early development' }
+  ]}
+>
+  <img
+    slot="visual"
+    src="/work/harbor.webp"
+    alt="Harbor showing a pull request diff with an inline review thread"
+    width="2400"
+    height="1553"
+    loading="eager"
+    decoding="async"
+  />
+
+  <h2>The review loop, in one focused app</h2>
+  <p>
+    Harbor brings repository switching, pull request inboxes, changed files, inline review threads, checks, workflow
+    runs, and logs into a single native workspace.
+  </p>
+  <p>
+    I’m building it in Rust with GPUI, using GitHub’s REST and GraphQL APIs alongside a local SQLite cache. It is early
+    software, with the core workflow currently developed and tested for macOS.
+  </p>
+</WorkProjectLayout>
+
+<style>
+  img {
+    display: block;
+    height: auto;
+    width: 100%;
+  }
+</style>

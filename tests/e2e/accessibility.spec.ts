@@ -5,6 +5,11 @@ const representativePages = [
   { name: 'home page', path: '/' },
   { name: 'writing index', path: '/writing/' },
   { name: 'topic page', path: '/writing/topics/swift/' },
+  { name: 'Harbor work showcase', path: '/work/harbor/' },
+  { name: 'Swift dependency work showcase', path: '/work/swift-unused-deps/' },
+  { name: 'Crate work showcase', path: '/work/obsidian-crate/' },
+  { name: 'initializer work showcase', path: '/work/init-revise-cli/' },
+  { name: 'Bazel migration work showcase', path: '/work/tuist-to-bazel/' },
   { name: 'article with charts', path: '/the-hidden-cost-behind-kotlin-multiplatform-on-ios/' }
 ]
 

@@ -1,0 +1,291 @@
+---
+import WorkProjectLayout from '@/layouts/WorkProjectLayout.astro'
+
+const description = 'Find dependency mistakes in Swift Bazel targets—and generate safe fixes.'
+---
+
+<WorkProjectLayout
+  title="swift_unused_deps"
+  {description}
+  eyebrow="Open source · Swift build tooling"
+  sourceHref="https://github.com/kaanbiryol/swift_unused_deps"
+  secondaryHref="https://github.com/kaanbiryol/swift_unused_deps#setup"
+  secondaryLabel="Setup"
+  visualCaption="A fixture-backed check finds two dependency mistakes, applies their fix plan, and verifies a clean graph."
+  facts={[
+    { label: 'Integration', value: 'bazel test' },
+    { label: 'Evidence', value: 'SwiftInfo · index store' },
+    { label: 'Actions', value: 'Check · report · fix' }
+  ]}
+>
+  <div slot="visual" class="terminal-visual" aria-label="swift_unused_deps check, fix, and verification demo">
+    <div class="terminal-bar">
+      <span class="traffic-lights" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span>swift_unused_deps</span>
+    </div>
+    <div class="terminal-body">
+      <section class="terminal-phase" aria-label="Check">
+        <p class="command"><span>$</span> bazel test --config=swift-unused-deps //tools:swift_unused_deps</p>
+        <div class="output">
+          <p class="version">swift_unused_deps v0.1.0</p>
+          <p class="muted">Analyzing 2 targets...</p>
+          <div class="finding">
+            <p class="target">//cases/Targets/<wbr />UnusedImport:UnusedImport</p>
+            <p><span class="status">Status:</span> 1 issue found</p>
+            <p class="issue"><strong>[HIGH] UNUSED_IMPORT</strong>: //cases/Deps/<wbr />LibA:LibA (module: LibA)</p>
+          </div>
+          <div class="finding">
+            <p class="target">//cases/Targets/<wbr />MissingDirectDep:MissingDirectDep</p>
+            <p><span class="status">Status:</span> 1 issue found</p>
+            <p class="issue">
+              <strong>[HIGH] MISSING_DIRECT_DEP</strong>: //cases/Deps/<wbr />TransitiveDep:TransitiveDep (module:
+              TransitiveDep)
+            </p>
+          </div>
+          <p class="summary">Summary: 2 targets analyzed, 2 issues found.</p>
+        </div>
+      </section>
+
+      <section class="terminal-phase" aria-label="Apply fixes">
+        <p class="command"><span>$</span> bazel run --config=swift-unused-deps //tools:swift_unused_deps_fix</p>
+        <div class="output fix-plan">
+          <p class="muted">Planned fixes:</p>
+          <p>remove //cases/Deps/LibA:LibA from deps of //cases/Targets/UnusedImport:UnusedImport</p>
+          <p>remove import LibA from cases/Targets/UnusedImport/UnusedImport.swift</p>
+          <p>
+            add //cases/Deps/TransitiveDep:TransitiveDep to deps of //cases/Targets/<wbr
+            />MissingDirectDep:MissingDirectDep
+          </p>
+        </div>
+      </section>
+
+      <section class="terminal-phase terminal-phase--verify" aria-label="Verify">
+        <p class="command"><span>$</span> bazel test --config=swift-unused-deps //tools:swift_unused_deps</p>
+        <div class="output verification">
+          <p>Summary: 2 targets analyzed, <strong>0 issues found.</strong></p>
+          <p class="passed">//tools:swift_unused_deps PASSED</p>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <h2>Dependency mistakes, surfaced where you already work</h2>
+  <p>
+    The check runs as an ordinary <code>bazel test</code>, reads the analyzed Swift graph, and turns compiler and
+    index-store evidence into findings that CI can enforce. Its generated fix target applies high-confidence BUILD and
+    source edits, then lets the same test prove the graph is clean.
+  </p>
+
+  <h3>What it catches</h3>
+  <ul class="capabilities">
+    <li>
+      <strong>Unused dependency</strong>
+      <span>Declared in BUILD, but never loaded.</span>
+    </li>
+    <li>
+      <strong>Unused import</strong>
+      <span>Imported in Swift, but no symbols are referenced.</span>
+    </li>
+    <li>
+      <strong>Missing direct dependency</strong>
+      <span>Imported directly, but only reachable transitively.</span>
+    </li>
+    <li>
+      <strong>Private dependency candidate</strong>
+      <span>Used internally, with nothing exposed through the public API.</span>
+    </li>
+  </ul>
+</WorkProjectLayout>
+
+<style>
+  .terminal-visual {
+    color: rgba(255, 255, 255, 0.9);
+    font-family: var(--mono);
+  }
+
+  .terminal-bar {
+    align-items: center;
+    background: #11151b;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    color: rgba(255, 255, 255, 0.5);
+    display: grid;
+    font-size: 0.75rem;
+    grid-template-columns: 1fr auto 1fr;
+    padding: 0.85rem 1rem;
+  }
+
+  .traffic-lights {
+    display: flex;
+    gap: 0.4rem;
+  }
+
+  .traffic-lights i {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: block;
+    height: 0.6rem;
+    width: 0.6rem;
+  }
+
+  .terminal-body {
+    padding: 1.9rem 2.5rem 2.2rem;
+  }
+
+  .terminal-phase + .terminal-phase {
+    border-top: 1px solid rgba(255, 255, 255, 0.09);
+    margin-top: 1.45rem;
+    padding-top: 1.45rem;
+  }
+
+  .command {
+    color: rgba(255, 255, 255, 0.78);
+    font-size: 0.78rem;
+    line-height: 1.6;
+    margin: 0 0 0.8rem;
+    overflow-wrap: anywhere;
+  }
+
+  .command span {
+    color: #8bd49c;
+  }
+
+  .output {
+    padding-left: 1.2rem;
+  }
+
+  .output p {
+    font-size: 0.71rem;
+    line-height: 1.55;
+    margin: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .version,
+  .target,
+  .summary {
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .muted,
+  .status {
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .finding {
+    margin-top: 0.5rem;
+  }
+
+  .issue {
+    color: rgba(255, 255, 255, 0.68);
+    padding-left: 1rem;
+  }
+
+  .issue strong {
+    color: #f3bd72;
+    font-weight: 500;
+  }
+
+  .summary {
+    margin-top: 0.55rem !important;
+  }
+
+  .fix-plan p:not(.muted) {
+    color: #a8c7fa;
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .fix-plan p:not(.muted)::before {
+    color: #8bd49c;
+    content: '›';
+    left: 0;
+    position: absolute;
+  }
+
+  .verification strong,
+  .passed {
+    color: #8bd49c;
+    font-weight: 500;
+  }
+
+  .passed {
+    margin-top: 0.15rem !important;
+  }
+
+  code {
+    background: var(--code-bg);
+    border-radius: 0.2rem;
+    color: var(--text-primary);
+    font-family: var(--mono);
+    font-size: 0.82em;
+    padding: 0.12em 0.3em;
+  }
+
+  h3 {
+    font-size: var(--font-size-s);
+    font-weight: var(--font-weight-bold);
+    line-height: 1.5;
+    margin: 1.9rem 0 0;
+  }
+
+  .capabilities {
+    display: grid;
+    gap: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    list-style: none;
+    margin: 0.65rem 0 0;
+    padding: 0;
+  }
+
+  .capabilities li {
+    border-top: 1px solid var(--border);
+    min-width: 0;
+    padding: 0.8rem 1.25rem 0.85rem 0;
+  }
+
+  .capabilities li:nth-child(even) {
+    padding-left: 1.25rem;
+    padding-right: 0;
+  }
+
+  .capabilities strong,
+  .capabilities span {
+    display: block;
+    font-size: var(--font-size-s);
+    line-height: 1.55;
+  }
+
+  .capabilities strong {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-bold);
+  }
+
+  .capabilities span {
+    color: var(--text-secondary);
+    margin-top: 0.15rem;
+  }
+
+  @media (max-width: 620px) {
+    .terminal-body {
+      padding: 1.5rem 1.25rem 1.75rem;
+    }
+
+    .output {
+      padding-left: 0.7rem;
+    }
+
+    .issue,
+    .fix-plan p:not(.muted) {
+      padding-left: 0.7rem;
+    }
+
+    .capabilities {
+      grid-template-columns: 1fr;
+    }
+
+    .capabilities li,
+    .capabilities li:nth-child(even) {
+      padding: 0.75rem 0 0.8rem;
+    }
+  }
+</style>

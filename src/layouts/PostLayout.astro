@@ -73,7 +73,7 @@ const ogImage = `/open-graph/${postSlug}.png?v=${ogImageVersion}`
           <PostShare title={plainTitle} url={postUrl} />
         </div>
         {themeConfig.post.toc && <TableOfContents toc={toc} />}
-        <article class="content">
+        <article class="content post-content">
           <slot />
         </article>
         <RelatedWriting posts={relatedPosts} />
